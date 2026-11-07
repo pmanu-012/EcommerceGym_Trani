@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using EcommerceGym.Shared;
+using EcommerceGym.Shared.Enums;
 
 namespace EcommerceGym.Api.Models
 {

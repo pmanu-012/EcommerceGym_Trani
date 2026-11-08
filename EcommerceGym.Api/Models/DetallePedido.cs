@@ -12,8 +12,10 @@ namespace EcommerceGym.Api.Models
         public decimal PrecioUnitario { get; set; }
 
         public int IdPedido { get; set; }
+        [ForeignKey(nameof(IdPedido))]
         public Pedido Pedido { get; set; } = null!;
         public int IdProducto { get; set; }
+        [ForeignKey(nameof(IdProducto))]
         public Producto Producto { get; set; } = null!;
     }
 }

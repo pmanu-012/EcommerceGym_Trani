@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using EcommerceGym.Shared.Enums;
+﻿using EcommerceGym.Shared.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EcommerceGym.Api.Models
 {
@@ -16,6 +17,7 @@ namespace EcommerceGym.Api.Models
         public string? ValorNuevo { get; set; }
 
         public int IdUsuario { get; set; }
+        [ForeignKey(nameof(IdUsuario))]
         public Usuario Usuario { get; set; } = null!;
     }
 }

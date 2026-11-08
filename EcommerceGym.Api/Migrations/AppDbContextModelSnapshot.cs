@@ -49,9 +49,6 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsuarioIdUsuario")
-                        .HasColumnType("int");
-
                     b.Property<string>("ValorAnterior")
                         .HasColumnType("nvarchar(max)");
 
@@ -60,7 +57,7 @@ namespace EcommerceGym.Api.Migrations
 
                     b.HasKey("IdAuditoria");
 
-                    b.HasIndex("UsuarioIdUsuario");
+                    b.HasIndex("IdUsuario");
 
                     b.ToTable("Auditorias");
                 });
@@ -135,17 +132,11 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<int>("IdProducto")
                         .HasColumnType("int");
 
-                    b.Property<int>("IngresoIdIngreso")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductoIdProducto")
-                        .HasColumnType("int");
-
                     b.HasKey("IdDetalleIngreso");
 
-                    b.HasIndex("IngresoIdIngreso");
+                    b.HasIndex("IdIngreso");
 
-                    b.HasIndex("ProductoIdProducto");
+                    b.HasIndex("IdProducto");
 
                     b.ToTable("DetallesIngreso");
                 });
@@ -167,20 +158,14 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<int>("IdProducto")
                         .HasColumnType("int");
 
-                    b.Property<int>("PedidoIdPedido")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProductoIdProducto")
-                        .HasColumnType("int");
-
                     b.HasKey("IdDetalle");
 
-                    b.HasIndex("PedidoIdPedido");
+                    b.HasIndex("IdPedido");
 
-                    b.HasIndex("ProductoIdProducto");
+                    b.HasIndex("IdProducto");
 
                     b.ToTable("DetallesPedido");
                 });
@@ -239,12 +224,9 @@ namespace EcommerceGym.Api.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("UsuarioIdUsuario")
-                        .HasColumnType("int");
-
                     b.HasKey("IdIngreso");
 
-                    b.HasIndex("UsuarioIdUsuario");
+                    b.HasIndex("IdUsuario");
 
                     b.ToTable("IngresosMercaderia");
                 });
@@ -299,12 +281,9 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("UsuarioIdUsuario")
-                        .HasColumnType("int");
-
                     b.HasKey("IdPedido");
 
-                    b.HasIndex("UsuarioIdUsuario");
+                    b.HasIndex("IdUsuario");
 
                     b.ToTable("Pedidos");
                 });
@@ -346,16 +325,13 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubcategoriaIdSubcategoria")
-                        .HasColumnType("int");
-
                     b.Property<string>("Uso")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("IdProducto");
 
-                    b.HasIndex("SubcategoriaIdSubcategoria");
+                    b.HasIndex("IdSubcategoria");
 
                     b.ToTable("Productos");
                 });
@@ -368,23 +344,15 @@ namespace EcommerceGym.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdProductoDisciplina"));
 
-                    b.Property<int>("DisciplinaIdDisciplina")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdDisciplina")
                         .HasColumnType("int");
 
                     b.Property<int>("IdProducto")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductoIdProducto")
-                        .HasColumnType("int");
-
                     b.HasKey("IdProductoDisciplina");
 
-                    b.HasIndex("DisciplinaIdDisciplina");
-
-                    b.HasIndex("ProductoIdProducto");
+                    b.HasIndex("IdDisciplina");
 
                     b.HasIndex("IdProducto", "IdDisciplina")
                         .IsUnique();
@@ -400,23 +368,15 @@ namespace EcommerceGym.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdProductoGrupoMuscular"));
 
-                    b.Property<int>("GrupoMuscularIdGrupoMuscular")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdGrupoMuscular")
                         .HasColumnType("int");
 
                     b.Property<int>("IdProducto")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductoIdProducto")
-                        .HasColumnType("int");
-
                     b.HasKey("IdProductoGrupoMuscular");
 
-                    b.HasIndex("GrupoMuscularIdGrupoMuscular");
-
-                    b.HasIndex("ProductoIdProducto");
+                    b.HasIndex("IdGrupoMuscular");
 
                     b.HasIndex("IdProducto", "IdGrupoMuscular")
                         .IsUnique();
@@ -446,12 +406,9 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsuarioIdUsuario")
-                        .HasColumnType("int");
-
                     b.HasKey("IdResena");
 
-                    b.HasIndex("UsuarioIdUsuario");
+                    b.HasIndex("IdUsuario");
 
                     b.ToTable("ResenasPlataforma");
                 });
@@ -481,17 +438,11 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductoIdProducto")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsuarioIdUsuario")
-                        .HasColumnType("int");
-
                     b.HasKey("IdResena");
 
-                    b.HasIndex("ProductoIdProducto");
+                    b.HasIndex("IdProducto");
 
-                    b.HasIndex("UsuarioIdUsuario");
+                    b.HasIndex("IdUsuario");
 
                     b.ToTable("ResenasProducto");
                 });
@@ -525,9 +476,6 @@ namespace EcommerceGym.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdSubcategoria"));
 
-                    b.Property<int>("CategoriaIdCategoria")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdCategoria")
                         .HasColumnType("int");
 
@@ -538,7 +486,7 @@ namespace EcommerceGym.Api.Migrations
 
                     b.HasKey("IdSubcategoria");
 
-                    b.HasIndex("CategoriaIdCategoria");
+                    b.HasIndex("IdCategoria");
 
                     b.ToTable("Subcategorias");
                 });
@@ -576,9 +524,6 @@ namespace EcommerceGym.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RolIdRol")
-                        .HasColumnType("int");
-
                     b.Property<string>("Telefono")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -589,7 +534,7 @@ namespace EcommerceGym.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("RolIdRol");
+                    b.HasIndex("IdRol");
 
                     b.ToTable("Usuarios");
                 });
@@ -598,7 +543,7 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("UsuarioIdUsuario")
+                        .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -628,13 +573,13 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.IngresoMercaderia", "Ingreso")
                         .WithMany("Detalles")
-                        .HasForeignKey("IngresoIdIngreso")
+                        .HasForeignKey("IdIngreso")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EcommerceGym.Api.Models.Producto", "Producto")
                         .WithMany()
-                        .HasForeignKey("ProductoIdProducto")
+                        .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -647,13 +592,13 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Pedido", "Pedido")
                         .WithMany("Detalles")
-                        .HasForeignKey("PedidoIdPedido")
+                        .HasForeignKey("IdPedido")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EcommerceGym.Api.Models.Producto", "Producto")
                         .WithMany()
-                        .HasForeignKey("ProductoIdProducto")
+                        .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -666,7 +611,7 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("UsuarioIdUsuario")
+                        .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -677,7 +622,7 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("UsuarioIdUsuario")
+                        .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -688,7 +633,7 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Subcategoria", "Subcategoria")
                         .WithMany()
-                        .HasForeignKey("SubcategoriaIdSubcategoria")
+                        .HasForeignKey("IdSubcategoria")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -699,13 +644,13 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Disciplina", "Disciplina")
                         .WithMany()
-                        .HasForeignKey("DisciplinaIdDisciplina")
+                        .HasForeignKey("IdDisciplina")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EcommerceGym.Api.Models.Producto", "Producto")
                         .WithMany("ProductoDisciplinas")
-                        .HasForeignKey("ProductoIdProducto")
+                        .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -718,13 +663,13 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.GrupoMuscular", "GrupoMuscular")
                         .WithMany()
-                        .HasForeignKey("GrupoMuscularIdGrupoMuscular")
+                        .HasForeignKey("IdGrupoMuscular")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EcommerceGym.Api.Models.Producto", "Producto")
                         .WithMany("ProductoGruposMusculares")
-                        .HasForeignKey("ProductoIdProducto")
+                        .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -737,7 +682,7 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("UsuarioIdUsuario")
+                        .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -748,13 +693,13 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Producto", "Producto")
                         .WithMany()
-                        .HasForeignKey("ProductoIdProducto")
+                        .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EcommerceGym.Api.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("UsuarioIdUsuario")
+                        .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -767,7 +712,7 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Categoria", "Categoria")
                         .WithMany("Subcategorias")
-                        .HasForeignKey("CategoriaIdCategoria")
+                        .HasForeignKey("IdCategoria")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -778,7 +723,7 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Rol", "Rol")
                         .WithMany()
-                        .HasForeignKey("RolIdRol")
+                        .HasForeignKey("IdRol")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

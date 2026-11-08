@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EcommerceGym.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracionInicial : Migration
+    public partial class MigracionInicialRehecha : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -70,15 +70,14 @@ namespace EcommerceGym.Api.Migrations
                     IdSubcategoria = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IdCategoria = table.Column<int>(type: "int", nullable: false),
-                    CategoriaIdCategoria = table.Column<int>(type: "int", nullable: false)
+                    IdCategoria = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Subcategorias", x => x.IdSubcategoria);
                     table.ForeignKey(
-                        name: "FK_Subcategorias_Categorias_CategoriaIdCategoria",
-                        column: x => x.CategoriaIdCategoria,
+                        name: "FK_Subcategorias_Categorias_IdCategoria",
+                        column: x => x.IdCategoria,
                         principalTable: "Categorias",
                         principalColumn: "IdCategoria",
                         onDelete: ReferentialAction.Restrict);
@@ -96,15 +95,14 @@ namespace EcommerceGym.Api.Migrations
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Activo = table.Column<bool>(type: "bit", nullable: false),
-                    IdRol = table.Column<int>(type: "int", nullable: false),
-                    RolIdRol = table.Column<int>(type: "int", nullable: false)
+                    IdRol = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Usuarios", x => x.IdUsuario);
                     table.ForeignKey(
-                        name: "FK_Usuarios_Roles_RolIdRol",
-                        column: x => x.RolIdRol,
+                        name: "FK_Usuarios_Roles_IdRol",
+                        column: x => x.IdRol,
                         principalTable: "Roles",
                         principalColumn: "IdRol",
                         onDelete: ReferentialAction.Restrict);
@@ -124,15 +122,14 @@ namespace EcommerceGym.Api.Migrations
                     Uso = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Material = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Activo = table.Column<bool>(type: "bit", nullable: false),
-                    IdSubcategoria = table.Column<int>(type: "int", nullable: false),
-                    SubcategoriaIdSubcategoria = table.Column<int>(type: "int", nullable: false)
+                    IdSubcategoria = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Productos", x => x.IdProducto);
                     table.ForeignKey(
-                        name: "FK_Productos_Subcategorias_SubcategoriaIdSubcategoria",
-                        column: x => x.SubcategoriaIdSubcategoria,
+                        name: "FK_Productos_Subcategorias_IdSubcategoria",
+                        column: x => x.IdSubcategoria,
                         principalTable: "Subcategorias",
                         principalColumn: "IdSubcategoria",
                         onDelete: ReferentialAction.Restrict);
@@ -150,15 +147,14 @@ namespace EcommerceGym.Api.Migrations
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ValorAnterior = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ValorNuevo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IdUsuario = table.Column<int>(type: "int", nullable: false),
-                    UsuarioIdUsuario = table.Column<int>(type: "int", nullable: false)
+                    IdUsuario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Auditorias", x => x.IdAuditoria);
                     table.ForeignKey(
-                        name: "FK_Auditorias_Usuarios_UsuarioIdUsuario",
-                        column: x => x.UsuarioIdUsuario,
+                        name: "FK_Auditorias_Usuarios_IdUsuario",
+                        column: x => x.IdUsuario,
                         principalTable: "Usuarios",
                         principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
@@ -172,15 +168,14 @@ namespace EcommerceGym.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Observacion = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    IdUsuario = table.Column<int>(type: "int", nullable: false),
-                    UsuarioIdUsuario = table.Column<int>(type: "int", nullable: false)
+                    IdUsuario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_IngresosMercaderia", x => x.IdIngreso);
                     table.ForeignKey(
-                        name: "FK_IngresosMercaderia_Usuarios_UsuarioIdUsuario",
-                        column: x => x.UsuarioIdUsuario,
+                        name: "FK_IngresosMercaderia_Usuarios_IdUsuario",
+                        column: x => x.IdUsuario,
                         principalTable: "Usuarios",
                         principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
@@ -201,15 +196,14 @@ namespace EcommerceGym.Api.Migrations
                     Ciudad = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Provincia = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CodigoPostal = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    IdUsuario = table.Column<int>(type: "int", nullable: false),
-                    UsuarioIdUsuario = table.Column<int>(type: "int", nullable: false)
+                    IdUsuario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Pedidos", x => x.IdPedido);
                     table.ForeignKey(
-                        name: "FK_Pedidos_Usuarios_UsuarioIdUsuario",
-                        column: x => x.UsuarioIdUsuario,
+                        name: "FK_Pedidos_Usuarios_IdUsuario",
+                        column: x => x.IdUsuario,
                         principalTable: "Usuarios",
                         principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
@@ -224,15 +218,14 @@ namespace EcommerceGym.Api.Migrations
                     Calificacion = table.Column<int>(type: "int", nullable: false),
                     Comentario = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IdUsuario = table.Column<int>(type: "int", nullable: false),
-                    UsuarioIdUsuario = table.Column<int>(type: "int", nullable: false)
+                    IdUsuario = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ResenasPlataforma", x => x.IdResena);
                     table.ForeignKey(
-                        name: "FK_ResenasPlataforma_Usuarios_UsuarioIdUsuario",
-                        column: x => x.UsuarioIdUsuario,
+                        name: "FK_ResenasPlataforma_Usuarios_IdUsuario",
+                        column: x => x.IdUsuario,
                         principalTable: "Usuarios",
                         principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
@@ -274,22 +267,20 @@ namespace EcommerceGym.Api.Migrations
                     IdProductoDisciplina = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdProducto = table.Column<int>(type: "int", nullable: false),
-                    ProductoIdProducto = table.Column<int>(type: "int", nullable: false),
-                    IdDisciplina = table.Column<int>(type: "int", nullable: false),
-                    DisciplinaIdDisciplina = table.Column<int>(type: "int", nullable: false)
+                    IdDisciplina = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductoDisciplinas", x => x.IdProductoDisciplina);
                     table.ForeignKey(
-                        name: "FK_ProductoDisciplinas_Disciplinas_DisciplinaIdDisciplina",
-                        column: x => x.DisciplinaIdDisciplina,
+                        name: "FK_ProductoDisciplinas_Disciplinas_IdDisciplina",
+                        column: x => x.IdDisciplina,
                         principalTable: "Disciplinas",
                         principalColumn: "IdDisciplina",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ProductoDisciplinas_Productos_ProductoIdProducto",
-                        column: x => x.ProductoIdProducto,
+                        name: "FK_ProductoDisciplinas_Productos_IdProducto",
+                        column: x => x.IdProducto,
                         principalTable: "Productos",
                         principalColumn: "IdProducto",
                         onDelete: ReferentialAction.Restrict);
@@ -302,22 +293,20 @@ namespace EcommerceGym.Api.Migrations
                     IdProductoGrupoMuscular = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdProducto = table.Column<int>(type: "int", nullable: false),
-                    ProductoIdProducto = table.Column<int>(type: "int", nullable: false),
-                    IdGrupoMuscular = table.Column<int>(type: "int", nullable: false),
-                    GrupoMuscularIdGrupoMuscular = table.Column<int>(type: "int", nullable: false)
+                    IdGrupoMuscular = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductoGruposMusculares", x => x.IdProductoGrupoMuscular);
                     table.ForeignKey(
-                        name: "FK_ProductoGruposMusculares_GruposMusculares_GrupoMuscularIdGrupoMuscular",
-                        column: x => x.GrupoMuscularIdGrupoMuscular,
+                        name: "FK_ProductoGruposMusculares_GruposMusculares_IdGrupoMuscular",
+                        column: x => x.IdGrupoMuscular,
                         principalTable: "GruposMusculares",
                         principalColumn: "IdGrupoMuscular",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ProductoGruposMusculares_Productos_ProductoIdProducto",
-                        column: x => x.ProductoIdProducto,
+                        name: "FK_ProductoGruposMusculares_Productos_IdProducto",
+                        column: x => x.IdProducto,
                         principalTable: "Productos",
                         principalColumn: "IdProducto",
                         onDelete: ReferentialAction.Restrict);
@@ -333,22 +322,20 @@ namespace EcommerceGym.Api.Migrations
                     Comentario = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IdUsuario = table.Column<int>(type: "int", nullable: false),
-                    UsuarioIdUsuario = table.Column<int>(type: "int", nullable: false),
-                    IdProducto = table.Column<int>(type: "int", nullable: false),
-                    ProductoIdProducto = table.Column<int>(type: "int", nullable: false)
+                    IdProducto = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ResenasProducto", x => x.IdResena);
                     table.ForeignKey(
-                        name: "FK_ResenasProducto_Productos_ProductoIdProducto",
-                        column: x => x.ProductoIdProducto,
+                        name: "FK_ResenasProducto_Productos_IdProducto",
+                        column: x => x.IdProducto,
                         principalTable: "Productos",
                         principalColumn: "IdProducto",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ResenasProducto_Usuarios_UsuarioIdUsuario",
-                        column: x => x.UsuarioIdUsuario,
+                        name: "FK_ResenasProducto_Usuarios_IdUsuario",
+                        column: x => x.IdUsuario,
                         principalTable: "Usuarios",
                         principalColumn: "IdUsuario",
                         onDelete: ReferentialAction.Restrict);
@@ -362,22 +349,20 @@ namespace EcommerceGym.Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
                     IdIngreso = table.Column<int>(type: "int", nullable: false),
-                    IngresoIdIngreso = table.Column<int>(type: "int", nullable: false),
-                    IdProducto = table.Column<int>(type: "int", nullable: false),
-                    ProductoIdProducto = table.Column<int>(type: "int", nullable: false)
+                    IdProducto = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DetallesIngreso", x => x.IdDetalleIngreso);
                     table.ForeignKey(
-                        name: "FK_DetallesIngreso_IngresosMercaderia_IngresoIdIngreso",
-                        column: x => x.IngresoIdIngreso,
+                        name: "FK_DetallesIngreso_IngresosMercaderia_IdIngreso",
+                        column: x => x.IdIngreso,
                         principalTable: "IngresosMercaderia",
                         principalColumn: "IdIngreso",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_DetallesIngreso_Productos_ProductoIdProducto",
-                        column: x => x.ProductoIdProducto,
+                        name: "FK_DetallesIngreso_Productos_IdProducto",
+                        column: x => x.IdProducto,
                         principalTable: "Productos",
                         principalColumn: "IdProducto",
                         onDelete: ReferentialAction.Restrict);
@@ -392,31 +377,29 @@ namespace EcommerceGym.Api.Migrations
                     Cantidad = table.Column<int>(type: "int", nullable: false),
                     PrecioUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IdPedido = table.Column<int>(type: "int", nullable: false),
-                    PedidoIdPedido = table.Column<int>(type: "int", nullable: false),
-                    IdProducto = table.Column<int>(type: "int", nullable: false),
-                    ProductoIdProducto = table.Column<int>(type: "int", nullable: false)
+                    IdProducto = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DetallesPedido", x => x.IdDetalle);
                     table.ForeignKey(
-                        name: "FK_DetallesPedido_Pedidos_PedidoIdPedido",
-                        column: x => x.PedidoIdPedido,
+                        name: "FK_DetallesPedido_Pedidos_IdPedido",
+                        column: x => x.IdPedido,
                         principalTable: "Pedidos",
                         principalColumn: "IdPedido",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_DetallesPedido_Productos_ProductoIdProducto",
-                        column: x => x.ProductoIdProducto,
+                        name: "FK_DetallesPedido_Productos_IdProducto",
+                        column: x => x.IdProducto,
                         principalTable: "Productos",
                         principalColumn: "IdProducto",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Auditorias_UsuarioIdUsuario",
+                name: "IX_Auditorias_IdUsuario",
                 table: "Auditorias",
-                column: "UsuarioIdUsuario");
+                column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CarritoItems_IdUsuario_IdProducto",
@@ -435,39 +418,39 @@ namespace EcommerceGym.Api.Migrations
                 column: "UsuarioIdUsuario");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetallesIngreso_IngresoIdIngreso",
+                name: "IX_DetallesIngreso_IdIngreso",
                 table: "DetallesIngreso",
-                column: "IngresoIdIngreso");
+                column: "IdIngreso");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetallesIngreso_ProductoIdProducto",
+                name: "IX_DetallesIngreso_IdProducto",
                 table: "DetallesIngreso",
-                column: "ProductoIdProducto");
+                column: "IdProducto");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetallesPedido_PedidoIdPedido",
+                name: "IX_DetallesPedido_IdPedido",
                 table: "DetallesPedido",
-                column: "PedidoIdPedido");
+                column: "IdPedido");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetallesPedido_ProductoIdProducto",
+                name: "IX_DetallesPedido_IdProducto",
                 table: "DetallesPedido",
-                column: "ProductoIdProducto");
+                column: "IdProducto");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IngresosMercaderia_UsuarioIdUsuario",
+                name: "IX_IngresosMercaderia_IdUsuario",
                 table: "IngresosMercaderia",
-                column: "UsuarioIdUsuario");
+                column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pedidos_UsuarioIdUsuario",
+                name: "IX_Pedidos_IdUsuario",
                 table: "Pedidos",
-                column: "UsuarioIdUsuario");
+                column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductoDisciplinas_DisciplinaIdDisciplina",
+                name: "IX_ProductoDisciplinas_IdDisciplina",
                 table: "ProductoDisciplinas",
-                column: "DisciplinaIdDisciplina");
+                column: "IdDisciplina");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductoDisciplinas_IdProducto_IdDisciplina",
@@ -476,14 +459,9 @@ namespace EcommerceGym.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductoDisciplinas_ProductoIdProducto",
-                table: "ProductoDisciplinas",
-                column: "ProductoIdProducto");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductoGruposMusculares_GrupoMuscularIdGrupoMuscular",
+                name: "IX_ProductoGruposMusculares_IdGrupoMuscular",
                 table: "ProductoGruposMusculares",
-                column: "GrupoMuscularIdGrupoMuscular");
+                column: "IdGrupoMuscular");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductoGruposMusculares_IdProducto_IdGrupoMuscular",
@@ -492,29 +470,24 @@ namespace EcommerceGym.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductoGruposMusculares_ProductoIdProducto",
-                table: "ProductoGruposMusculares",
-                column: "ProductoIdProducto");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Productos_SubcategoriaIdSubcategoria",
+                name: "IX_Productos_IdSubcategoria",
                 table: "Productos",
-                column: "SubcategoriaIdSubcategoria");
+                column: "IdSubcategoria");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ResenasPlataforma_UsuarioIdUsuario",
+                name: "IX_ResenasPlataforma_IdUsuario",
                 table: "ResenasPlataforma",
-                column: "UsuarioIdUsuario");
+                column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ResenasProducto_ProductoIdProducto",
+                name: "IX_ResenasProducto_IdProducto",
                 table: "ResenasProducto",
-                column: "ProductoIdProducto");
+                column: "IdProducto");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ResenasProducto_UsuarioIdUsuario",
+                name: "IX_ResenasProducto_IdUsuario",
                 table: "ResenasProducto",
-                column: "UsuarioIdUsuario");
+                column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_Nombre",
@@ -523,9 +496,9 @@ namespace EcommerceGym.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subcategorias_CategoriaIdCategoria",
+                name: "IX_Subcategorias_IdCategoria",
                 table: "Subcategorias",
-                column: "CategoriaIdCategoria");
+                column: "IdCategoria");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_Email",
@@ -534,9 +507,9 @@ namespace EcommerceGym.Api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Usuarios_RolIdRol",
+                name: "IX_Usuarios_IdRol",
                 table: "Usuarios",
-                column: "RolIdRol");
+                column: "IdRol");
         }
 
         /// <inheritdoc />

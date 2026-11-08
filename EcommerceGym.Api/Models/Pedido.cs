@@ -26,6 +26,7 @@ namespace EcommerceGym.Api.Models
         public string CodigoPostal { get; set; } = string.Empty;
 
         public int IdUsuario { get; set; }
+        [ForeignKey(nameof(IdUsuario))]
         public Usuario Usuario { get; set; } = null!;
         public List<DetallePedido> Detalles { get; set; } = new();
     }

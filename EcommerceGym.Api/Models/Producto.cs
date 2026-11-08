@@ -22,6 +22,7 @@ namespace EcommerceGym.Api.Models
         public bool Activo { get; set; } = true;
 
         public int IdSubcategoria { get; set; }
+        [ForeignKey(nameof(IdSubcategoria))]
         public Subcategoria Subcategoria { get; set; } = null!;
         public List<ProductoDisciplina> ProductoDisciplinas { get; set; } = new();
         public List<ProductoGrupoMuscular> ProductoGruposMusculares { get; set; } = new();

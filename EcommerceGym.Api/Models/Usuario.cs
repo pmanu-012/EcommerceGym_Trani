@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EcommerceGym.Api.Models
 {
@@ -18,6 +19,7 @@ namespace EcommerceGym.Api.Models
         public bool Activo { get; set; } = true;
 
         public int IdRol { get; set; }
+        [ForeignKey(nameof(IdRol))]
         public Rol Rol { get; set; } = null!;
     }
 }

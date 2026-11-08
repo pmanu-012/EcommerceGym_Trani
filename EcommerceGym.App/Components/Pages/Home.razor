@@ -1,5 +1,42 @@
 ﻿@page "/"
+@inject ProductoService ProductoService
 
-<h1>Hello, world!</h1>
+<h3>Prueba de conexión</h3>
 
-Welcome to your new app.
+@if (error is not null)
+{
+    <p style="color:red">@error</p>
+}
+else if (productos is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <p>Productos recibidos: @productos.Count</p>
+    <ul>
+        @foreach (var p in productos)
+        {
+            <li>@p.Nombre — $@p.Precio</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<ProductoDto>? productos;
+    private string? error;
+
+    //es un evento del ciclo de vida de los componentes que se ejecuta una sola vez cuando 
+    //el componente está listo para iniciarse y ya ha recibido sus parámetros iniciales
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            productos = await ProductoService.GetProductosAsync();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+}

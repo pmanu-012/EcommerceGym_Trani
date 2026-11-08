@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using EcommerceGym.App.Services;
+using Microsoft.Extensions.Logging;
 
 namespace EcommerceGym.App
 {
@@ -20,7 +21,8 @@ namespace EcommerceGym.App
     		builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
-
+            builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(ApiConfig.BaseUrl) });
+            builder.Services.AddScoped<ProductoService>();
             return builder.Build();
         }
     }

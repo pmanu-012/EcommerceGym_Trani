@@ -34,3 +34,61 @@ Content-Type: application/json
   "email": "juan@test.com",
   "password": "123456"
 }
+
+### Todas las categorías
+GET {{host}}/api/categorias
+
+### Solo ofertas, de menor a mayor precio
+GET {{host}}/api/productos?soloOfertas=true&orden=precio_asc
+
+### Búsqueda
+GET {{host}}/api/productos?buscar=banco
+
+### Filtro por categoría
+GET {{host}}/api/productos?idCategoria=1
+
+### Detalle de un producto
+GET {{host}}/api/productos/5
+
+### Login como cliente
+# @name loginCliente
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "cliente@ecommercegym.com",
+  "password": "Cliente123!"
+}
+
+### Agregar al carrito
+POST {{host}}/api/carrito
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "idProducto": 5, "cantidad": 2 }
+
+### Ver carrito
+GET {{host}}/api/carrito
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+### Cambiar cantidad (usá el idCarritoItem que devuelve el GET anterior)
+PUT {{host}}/api/carrito/1
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "cantidad": 3 }
+
+### Pedir más que el stock (tiene que dar 400)
+POST {{host}}/api/carrito
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "idProducto": 5, "cantidad": 999 }
+
+### Eliminar del carrito
+DELETE {{host}}/api/carrito/1
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+### El admin no tiene carrito (tiene que dar 403)
+GET {{host}}/api/carrito
+Authorization: Bearer {{login.response.body.$.token}}

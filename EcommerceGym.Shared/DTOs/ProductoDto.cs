@@ -14,5 +14,10 @@ namespace EcommerceGym.Shared.DTOs
         public string ImagenUrl { get; set; } = string.Empty;
         public string Categoria { get; set; } = string.Empty;
         public string Subcategoria { get; set; } = string.Empty;
+        public bool EnOferta => PrecioOferta.HasValue;
+        public decimal PrecioFinal => PrecioOferta ?? Precio;
+        public int? PorcentajeDescuento => PrecioOferta.HasValue && Precio > 0
+            ? (int)Math.Round((1 - PrecioOferta.Value / Precio) * 100)
+            : null;
     }
 }

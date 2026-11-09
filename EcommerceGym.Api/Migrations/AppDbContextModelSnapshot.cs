@@ -79,17 +79,9 @@ namespace EcommerceGym.Api.Migrations
                     b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductoIdProducto")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsuarioIdUsuario")
-                        .HasColumnType("int");
-
                     b.HasKey("IdCarritoItem");
 
-                    b.HasIndex("ProductoIdProducto");
-
-                    b.HasIndex("UsuarioIdUsuario");
+                    b.HasIndex("IdProducto");
 
                     b.HasIndex("IdUsuario", "IdProducto")
                         .IsUnique();
@@ -554,13 +546,13 @@ namespace EcommerceGym.Api.Migrations
                 {
                     b.HasOne("EcommerceGym.Api.Models.Producto", "Producto")
                         .WithMany()
-                        .HasForeignKey("ProductoIdProducto")
+                        .HasForeignKey("IdProducto")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("EcommerceGym.Api.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("UsuarioIdUsuario")
+                        .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

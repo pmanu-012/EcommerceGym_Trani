@@ -92,3 +92,74 @@ Authorization: Bearer {{loginCliente.response.body.$.token}}
 ### El admin no tiene carrito (tiene que dar 403)
 GET {{host}}/api/carrito
 Authorization: Bearer {{login.response.body.$.token}}
+
+### 1. Dejar el carrito con dos productos
+POST {{host}}/api/carrito
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "idProducto": 5, "cantidad": 2 }
+
+###
+POST {{host}}/api/carrito
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "idProducto": 1, "cantidad": 1 }
+
+### 2. Checkout
+# @name pedido
+POST {{host}}/api/pedidos
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "calle": "Sarmiento",
+  "numero": "108",
+  "ciudad": "Santa Rosa",
+  "provincia": "La Pampa",
+  "codigoPostal": "L6300"
+}
+
+### 3. Checkout con carrito vacío (tiene que dar 400)
+POST {{host}}/api/pedidos
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "calle": "Sarmiento",
+  "numero": "108",
+  "ciudad": "Santa Rosa",
+  "provincia": "La Pampa",
+  "codigoPostal": "L6300"
+}
+
+### 4. Mis pedidos
+GET {{host}}/api/pedidos/mis-pedidos
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+### 5. Detalle de un pedido
+GET {{host}}/api/pedidos/{{pedido.response.body.$.idPedido}}
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+### 6. El admin puede ver cualquier pedido (200)
+GET {{host}}/api/pedidos/{{pedido.response.body.$.idPedido}}
+Authorization: Bearer {{login.response.body.$.token}}
+
+### 7. El admin no puede comprar (403)
+POST {{host}}/api/pedidos
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "calle": "x", "numero": "1", "ciudad": "x", "provincia": "x", "codigoPostal": "x" }
+
+### 8. Otro cliente no puede ver el pedido (404)
+# @name loginJuan
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "juan@test.com", "password": "123456" }
+
+###
+GET {{host}}/api/pedidos/{{pedido.response.body.$.idPedido}}
+Authorization: Bearer {{loginJuan.response.body.$.token}}

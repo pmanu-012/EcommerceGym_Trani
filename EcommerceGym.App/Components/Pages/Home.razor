@@ -1,7 +1,21 @@
 ﻿@page "/"
 @inject ProductoService ProductoService
+@inject AuthService Auth
 
 <h3>Prueba de conexión</h3>
+
+<AuthorizeView>
+     <Authorized>
+         <p>
+             Hola, @context.User.Identity?.Name (@(context.User.IsInRole("Administrador") ? "Administrador" : "Cliente"))
+             <button class="btn btn-sm btn-outline-dark ms-2" @onclick="Auth.LogoutAsync">Cerrar sesión</button>
+         </p>
+     </Authorized>
+     <NotAuthorized>
+         <a class="btn btn-sm btn-dark" href="login">Iniciar sesión</a>
+     </NotAuthorized>
+</AuthorizeView>
+ <p><a href="prueba-admin">Ir a la zona de administradores</a></p>
 
 @if (error is not null)
 {

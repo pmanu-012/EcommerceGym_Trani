@@ -1,5 +1,6 @@
 ﻿using EcommerceGym.App.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace EcommerceGym.App
 {
@@ -21,6 +22,10 @@ namespace EcommerceGym.App
     		builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddSingleton<TokenStore>();
+            builder.Services.AddSingleton<AuthService>();
+            builder.Services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<AuthService>());
             builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(ApiConfig.BaseUrl) });
             builder.Services.AddScoped<ProductoService>();
             return builder.Build();

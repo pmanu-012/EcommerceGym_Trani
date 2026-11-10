@@ -1,0 +1,121 @@
+﻿@page "/login"
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<div class="container py-3" style="max-width: 480px;">
+
+    <div class="position-relative text-center mb-3">
+        <button class="btn btn-link text-dark p-0 position-absolute start-0 fs-4" @onclick="Volver">&larr;</button>
+        <h1 class="h5 m-0">Acceder</h1>
+    </div>
+
+    <div class="d-flex bg-light rounded-3 p-1 mb-4">
+        <button class="btn flex-fill @(modoLogin ? "bg-white shadow-sm fw-semibold" : "text-secondary")"
+                @onclick="() => CambiarModo(true)">
+            Login
+        </button>
+        <button class="btn flex-fill @(!modoLogin ? "bg-white shadow-sm fw-semibold" : "text-secondary")"
+                @onclick="() => CambiarModo(false)">
+            Registro
+        </button>
+    </div>
+
+    @if (modoLogin)
+    {
+        <EditForm Model="loginModel" OnValidSubmit="EnviarLogin">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <InputText class="form-control bg-light" inputmode="email" @bind-Value="loginModel.Email" />
+                <ValidationMessage For="() => loginModel.Email" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <InputText class="form-control bg-light" type="password" @bind-Value="loginModel.Password" />
+                <ValidationMessage For="() => loginModel.Password" />
+            </div>
+
+            @if (error is not null)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+
+            <button class="btn btn-dark w-100 py-2" type="submit" disabled="@cargando">Iniciar sesión</button>
+            <button class="btn btn-light w-100 py-2 mt-2" type="button" @onclick="() => CambiarModo(false)">
+                ¿No tenés cuenta? Registrate
+            </button>
+        </EditForm>
+    }
+    else
+    {
+        <EditForm Model="registroModel" OnValidSubmit="EnviarRegistro">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <InputText class="form-control bg-light" @bind-Value="registroModel.Nombre" />
+                <ValidationMessage For="() => registroModel.Nombre" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Apellido</label>
+                <InputText class="form-control bg-light" @bind-Value="registroModel.Apellido" />
+                <ValidationMessage For="() => registroModel.Apellido" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Teléfono</label>
+                <InputText class="form-control bg-light" inputmode="tel" @bind-Value="registroModel.Telefono" />
+                <ValidationMessage For="() => registroModel.Telefono" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <InputText class="form-control bg-light" inputmode="email" @bind-Value="registroModel.Email" />
+                <ValidationMessage For="() => registroModel.Email" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <InputText class="form-control bg-light" type="password" @bind-Value="registroModel.Password" />
+                <ValidationMessage For="() => registroModel.Password" />
+            </div>
+
+            @if (error is not null)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+
+            <button class="btn btn-dark w-100 py-2" type="submit" disabled="@cargando">Registrarse</button>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private bool modoLogin = true;
+    private bool cargando;
+    private string? error;
+    private readonly LoginDto loginModel = new();
+    private readonly RegistroDto registroModel = new();
+
+    private void CambiarModo(bool login)
+    {
+        modoLogin = login;
+        error = null;
+    }
+
+    private async Task EnviarLogin()
+    {
+        cargando = true;
+        error = await Auth.LoginAsync(loginModel);
+        cargando = false;
+        if (error is null) Nav.NavigateTo("/");
+    }
+
+    private async Task EnviarRegistro()
+    {
+        cargando = true;
+        error = await Auth.RegistroAsync(registroModel);
+        cargando = false;
+        if (error is null) Nav.NavigateTo("/");
+    }
+
+    private void Volver() => Nav.NavigateTo("/");
+}

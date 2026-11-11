@@ -1,3 +1,11 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
 :root {
     --carbon: #15171A;
     --grafito: #2B2F36;
@@ -265,4 +273,72 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Encabezado de página, filtros y estados */
+.encabezado-pagina {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+    .encabezado-pagina h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+.volver {
+    color: var(--carbon);
+    margin-left: -.4rem;
+}
+
+    .volver:active {
+        background: rgba(0, 0, 0, .08);
+    }
+
+.barra-filtros {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.select-filtro {
+    flex: 1;
+    min-width: 0;
+    padding: .55rem .6rem;
+    font-size: .9rem;
+    background: #fff;
+    color: var(--carbon);
+    border: 1px solid #d5d8dd;
+    border-radius: 10px;
+}
+
+.buscador {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+    .buscador input {
+        flex: 1;
+        min-width: 0;
+        padding: .65rem .8rem;
+        background: #fff;
+        border: 1px solid #d5d8dd;
+        border-radius: 10px;
+    }
+
+.estado-vacio {
+    text-align: center;
+    color: var(--gris-texto);
+    padding: 2rem 0;
+}
+
+.mensaje-error {
+    background: #fde8ea;
+    color: var(--rojo-oferta);
+    padding: .75rem 1rem;
+    border-radius: 10px;
 }

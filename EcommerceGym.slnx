@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="EcommerceGym.Api/EcommerceGym.Api.csproj" />
-  <Project Path="EcommerceGym.App/EcommerceGym.App.csproj" />
+  <Project Path="EcommerceGym.App/EcommerceGym.App.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
   <Project Path="EcommerceGym.Shared/EcommerceGym.Shared.csproj" />
 </Solution>

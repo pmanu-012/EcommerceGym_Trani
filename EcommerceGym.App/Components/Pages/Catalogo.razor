@@ -1,0 +1,20 @@
+﻿@page "/catalogo/{IdCategoria:int}"
+@inject CategoriaService Categorias
+
+<EncabezadoPagina Titulo="@nombre" />
+<ListadoProductos IdCategoria="IdCategoria" />
+
+@code {
+    [Parameter] public int IdCategoria { get; set; }
+    private string nombre = "Catálogo";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            var categorias = await Categorias.GetCategoriasAsync();
+            nombre = categorias.FirstOrDefault(c => c.IdCategoria == IdCategoria)?.Nombre ?? "Catálogo";
+        }
+        catch (Exception) { }
+    }
+}

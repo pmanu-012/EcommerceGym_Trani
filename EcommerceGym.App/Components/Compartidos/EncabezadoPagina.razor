@@ -1,0 +1,16 @@
+﻿@inject IJSRuntime JS
+
+<div class="encabezado-pagina">
+    @if (MostrarVolver)
+    {
+        <button class="icon-btn volver" @onclick="Volver" aria-label="Volver"><Icono Nombre="back" /></button>
+    }
+    <h1>@Titulo</h1>
+</div>
+
+@code {
+    [Parameter] public string Titulo { get; set; } = string.Empty;
+    [Parameter] public bool MostrarVolver { get; set; } = true;
+
+    private async Task Volver() => await JS.InvokeVoidAsync("history.back");
+}

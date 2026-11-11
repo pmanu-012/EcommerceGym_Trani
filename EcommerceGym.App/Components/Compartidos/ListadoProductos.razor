@@ -1,0 +1,106 @@
+﻿@inject ProductoService Productos
+@inject CategoriaService Categorias
+
+<div class="barra-filtros">
+    @if (subcategorias is { Count: > 0 })
+    {
+        <select class="select-filtro" @bind="idSubcategoria" @bind:after="Cargar">
+            <option value="">Todas las subcategorías</option>
+            @foreach (var s in subcategorias)
+            {
+                <option value="@s.IdSubcategoria">@s.Nombre</option>
+            }
+        </select>
+    }
+    <select class="select-filtro" @bind="orden" @bind:after="Cargar">
+        <option value="">Nombre (A-Z)</option>
+        <option value="precio_asc">Precio: menor a mayor</option>
+        <option value="precio_desc">Precio: mayor a menor</option>
+        <option value="recientes">Más nuevos</option>
+    </select>
+</div>
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (productos is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (productos.Count == 0)
+{
+    <p class="estado-vacio">No encontramos productos con esos filtros.</p>
+}
+else
+{
+    <div class="grid-productos">
+        @foreach (var p in productos)
+        {
+            <ProductoCard Producto="p" />
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public int? IdCategoria { get; set; }
+    [Parameter] public bool SoloOfertas { get; set; }
+    [Parameter] public string? Buscar { get; set; }
+
+    private List<ProductoDto>? productos;
+    private List<SubcategoriaDto>? subcategorias;
+    private int? idSubcategoria;
+    private string orden = string.Empty;
+    private string? error;
+
+    private bool inicializado;
+    private int? ultimaCategoria;
+    private bool ultimoSoloOfertas;
+    private string? ultimaBusqueda;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Solo recarga si cambió algún parámetro
+        if (inicializado && ultimaCategoria == IdCategoria && ultimoSoloOfertas == SoloOfertas && ultimaBusqueda == Buscar)
+            return;
+
+        inicializado = true;
+        ultimaCategoria = IdCategoria;
+        ultimoSoloOfertas = SoloOfertas;
+        ultimaBusqueda = Buscar;
+
+        idSubcategoria = null;
+        subcategorias = null;
+        productos = null;
+
+        if (IdCategoria.HasValue)
+        {
+            try
+            {
+                var categorias = await Categorias.GetCategoriasAsync();
+                // La subcategoría "General" existe solo por la normalización: no se ofrece como filtro
+                subcategorias = categorias
+                    .FirstOrDefault(c => c.IdCategoria == IdCategoria)?
+                    .Subcategorias.Where(s => s.Nombre != "General").ToList();
+            }
+            catch (Exception) { /* sin filtro de subcategorías */ }
+        }
+
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        error = null;
+        try
+        {
+            productos = await Productos.GetProductosAsync(
+                IdCategoria, idSubcategoria, Buscar, SoloOfertas,
+                string.IsNullOrEmpty(orden) ? null : orden);
+        }
+        catch (Exception)
+        {
+            error = "No se pudieron cargar los productos. Verificá tu conexión e intentá de nuevo.";
+        }
+    }
+}

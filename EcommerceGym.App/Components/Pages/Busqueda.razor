@@ -1,0 +1,24 @@
+﻿@page "/buscar"
+
+<EncabezadoPagina Titulo="Buscar" />
+
+<form class="buscador" @onsubmit="Buscar">
+    <input type="search" placeholder="Buscar productos..." @bind="texto" @bind:event="oninput" />
+    <button class="btn-accent" type="submit">Buscar</button>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(terminoActivo))
+{
+    <ListadoProductos Buscar="@terminoActivo" />
+}
+else
+{
+    <p class="estado-vacio">Escribí el nombre de un producto para buscarlo.</p>
+}
+
+@code {
+    private string texto = string.Empty;
+    private string? terminoActivo;
+
+    private void Buscar() => terminoActivo = texto.Trim();
+}

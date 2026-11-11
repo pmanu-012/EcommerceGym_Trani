@@ -1,4 +1,4 @@
-@host = http://localhost:5196
+@host = http://EcommerceGymMovil.somee.com
 
 ### Login como administrador
 # @name login

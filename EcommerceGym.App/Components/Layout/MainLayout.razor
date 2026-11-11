@@ -1,3 +1,34 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<div class="app-shell">
+    <header class="topbar">
+        <a class="marca" href="/">Gym <span>E-Commerce</span></a>
+        <div class="acciones">
+            <a class="icon-btn" href="buscar" aria-label="Buscar"><Icono Nombre="search" /></a>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <a class="icon-btn" href="login" aria-label="Iniciar sesión"><Icono Nombre="login" /></a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </header>
+
+    <main class="contenido">@Body</main>
+
+    <nav class="bottom-nav">
+        <NavLink href="/" Match="NavLinkMatch.All" ActiveClass="activo"><Icono Nombre="home" /><span>Home</span></NavLink>
+        <button class="@(mostrarCategorias ? "activo" : null)" @onclick="() => mostrarCategorias = true">
+            <Icono Nombre="apps" /><span>Categorías</span>
+        </button>
+        <NavLink href="ofertas" ActiveClass="activo"><Icono Nombre="offer" /><span>Ofertas</span></NavLink>
+        <NavLink href="carrito" ActiveClass="activo"><Icono Nombre="cart" /><span>Carrito</span></NavLink>
+        <NavLink href="perfil" ActiveClass="activo"><Icono Nombre="person" /><span>Perfil</span></NavLink>
+    </nav>
+</div>
+
+<HojaCategorias Visible="mostrarCategorias" OnCerrar="CerrarCategorias" />
+
+@code {
+    private bool mostrarCategorias;
+    private void CerrarCategorias() => mostrarCategorias = false;
+}

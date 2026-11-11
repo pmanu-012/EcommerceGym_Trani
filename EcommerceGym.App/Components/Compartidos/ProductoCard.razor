@@ -1,0 +1,34 @@
+﻿<a class="card-producto" href="producto/@Producto.IdProducto">
+    <div class="img">
+        @if (!string.IsNullOrWhiteSpace(Producto.ImagenUrl))
+        {
+            <img src="@Producto.ImagenUrl" alt="@Producto.Nombre" />
+        }
+        else
+        {
+            <span>Sin imagen</span>
+        }
+    </div>
+    <div class="cuerpo">
+        <span class="nombre">@Producto.Nombre</span>
+        @if (Producto.EnOferta)
+        {
+            <span class="badge-oferta">@(Producto.PorcentajeDescuento)% OFF</span>
+        }
+        <div>
+            <span class="precio">@Formato.Precio(Producto.PrecioFinal)</span>
+            @if (Producto.EnOferta)
+            {
+                <span class="precio-tachado">@Formato.Precio(Producto.Precio)</span>
+            }
+        </div>
+        @if (Producto.Stock <= 0)
+        {
+            <span class="sin-stock">Sin stock</span>
+        }
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired] public ProductoDto Producto { get; set; } = null!;
+}

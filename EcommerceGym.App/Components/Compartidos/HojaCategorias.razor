@@ -1,0 +1,47 @@
+﻿@inject CategoriaService Categorias
+@inject NavigationManager Nav
+
+@if (Visible)
+{
+    <div class="hoja-fondo" @onclick="OnCerrar"></div>
+    <div class="hoja">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 m-0">Categorías</h2>
+            <button class="icon-btn text-dark" @onclick="OnCerrar" aria-label="Cerrar">✕</button>
+        </div>
+
+        @if (lista is null)
+        {
+            <p class="text-secondary">Cargando...</p>
+        }
+        else
+        {
+            foreach (var c in lista)
+            {
+                <button class="item-cat" @onclick="() => Ir(c.IdCategoria)">@c.Nombre</button>
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback OnCerrar { get; set; }
+
+    private List<CategoriaDto>? lista;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Visible && lista is null)
+        {
+            try { lista = await Categorias.GetCategoriasAsync(); }
+            catch { lista = new(); }
+        }
+    }
+
+    private async Task Ir(int idCategoria)
+    {
+        await OnCerrar.InvokeAsync();
+        Nav.NavigateTo($"catalogo/{idCategoria}");
+    }
+}

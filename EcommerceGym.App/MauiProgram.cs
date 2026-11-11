@@ -28,6 +28,7 @@ namespace EcommerceGym.App
             builder.Services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<AuthService>());
             builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(ApiConfig.BaseUrl) });
             builder.Services.AddScoped<ProductoService>();
+            builder.Services.AddSingleton<CategoriaService>();
             return builder.Build();
         }
     }

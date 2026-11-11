@@ -1,56 +1,57 @@
 ﻿@page "/"
-@inject ProductoService ProductoService
-@inject AuthService Auth
+@inject ProductoService Productos
 
-<h3>Prueba de conexión</h3>
-
-<AuthorizeView>
-     <Authorized>
-         <p>
-             Hola, @context.User.Identity?.Name (@(context.User.IsInRole("Administrador") ? "Administrador" : "Cliente"))
-             <button class="btn btn-sm btn-outline-dark ms-2" @onclick="Auth.LogoutAsync">Cerrar sesión</button>
-         </p>
-     </Authorized>
-     <NotAuthorized>
-         <a class="btn btn-sm btn-dark" href="login">Iniciar sesión</a>
-     </NotAuthorized>
-</AuthorizeView>
- <p><a href="prueba-admin">Ir a la zona de administradores</a></p>
+<section class="hero">
+    <h1>Equipamiento para tu gimnasio</h1>
+    <p>Todo lo que necesitás para entrenar, en un solo lugar.</p>
+    <a class="btn-accent" href="ofertas">Ver ofertas</a>
+</section>
 
 @if (error is not null)
 {
-    <p style="color:red">@error</p>
+    <div class="alert alert-danger">@error</div>
 }
-else if (productos is null)
+else if (destacados is null || ofertas is null)
 {
-    <p>Cargando...</p>
+    <p class="text-secondary">Cargando...</p>
 }
 else
 {
-    <p>Productos recibidos: @productos.Count</p>
-    <ul>
-        @foreach (var p in productos)
+    @if (ofertas.Count > 0)
+    {
+        <h2 class="titulo-seccion">Ofertas</h2>
+        <div class="grid-productos">
+            @foreach (var p in ofertas)
+            {
+                <ProductoCard Producto="p" />
+            }
+        </div>
+    }
+
+    <h2 class="titulo-seccion">Productos destacados</h2>
+    <div class="grid-productos">
+        @foreach (var p in destacados)
         {
-            <li>@p.Nombre — $@p.Precio</li>
+            <ProductoCard Producto="p" />
         }
-    </ul>
+    </div>
 }
 
 @code {
-    private List<ProductoDto>? productos;
+    private List<ProductoDto>? destacados;
+    private List<ProductoDto>? ofertas;
     private string? error;
 
-    //es un evento del ciclo de vida de los componentes que se ejecuta una sola vez cuando 
-    //el componente está listo para iniciarse y ya ha recibido sus parámetros iniciales
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            productos = await ProductoService.GetProductosAsync();
+            ofertas = (await Productos.GetProductosAsync(soloOfertas: true)).Take(4).ToList();
+            destacados = (await Productos.GetProductosAsync(orden: "recientes")).Take(6).ToList();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            error = ex.Message;
+            error = "No se pudieron cargar los productos. Verificá tu conexión e intentá de nuevo.";
         }
     }
 }

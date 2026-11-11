@@ -1,0 +1,21 @@
+﻿@page "/perfil"
+@attribute [Authorize]
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<div class="text-center py-4">
+    <div class="avatar"><Icono Nombre="person" Tamano="56" /></div>
+    <h1 class="h5 mt-3">@Auth.Sesion?.Nombre @Auth.Sesion?.Apellido</h1>
+    <p class="text-secondary mb-1">@Auth.Sesion?.Email</p>
+    <span class="badge text-bg-dark">@Auth.Sesion?.Rol</span>
+</div>
+
+<button class="btn btn-danger w-100 py-2" @onclick="Salir">Cerrar sesión</button>
+
+@code {
+    private async Task Salir()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/");
+    }
+}

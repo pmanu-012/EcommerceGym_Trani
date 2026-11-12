@@ -1,4 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject AuthService Auth
+@inject CarritoService Carrito
+@inject NavigationManager Nav
 
 <div class="app-shell">
     <header class="topbar">
@@ -13,22 +17,65 @@
         </div>
     </header>
 
-    <main class="contenido">@Body</main>
+    <main class="contenido @(ocultarNav ? "sin-nav" : null)">@Body</main>
 
-    <nav class="bottom-nav">
-        <NavLink href="/" Match="NavLinkMatch.All" ActiveClass="activo"><Icono Nombre="home" /><span>Home</span></NavLink>
-        <button class="@(mostrarCategorias ? "activo" : null)" @onclick="() => mostrarCategorias = true">
-            <Icono Nombre="apps" /><span>Categorías</span>
-        </button>
-        <NavLink href="ofertas" ActiveClass="activo"><Icono Nombre="offer" /><span>Ofertas</span></NavLink>
-        <NavLink href="carrito" ActiveClass="activo"><Icono Nombre="cart" /><span>Carrito</span></NavLink>
-        <NavLink href="perfil" ActiveClass="activo"><Icono Nombre="person" /><span>Perfil</span></NavLink>
-    </nav>
+    @if (!ocultarNav)
+    {
+        <nav class="bottom-nav">
+            <NavLink href="/" Match="NavLinkMatch.All" ActiveClass="activo"><Icono Nombre="home" /><span>Home</span></NavLink>
+            <button class="@(mostrarCategorias ? "activo" : null)" @onclick="() => mostrarCategorias = true">
+                <Icono Nombre="apps" /><span>Categorías</span>
+            </button>
+            <NavLink href="ofertas" ActiveClass="activo"><Icono Nombre="offer" /><span>Ofertas</span></NavLink>
+            <NavLink href="carrito" ActiveClass="activo">
+                <span class="icono-con-badge">
+                    <Icono Nombre="cart" />
+                    @if (Carrito.CantidadTotal > 0)
+                    {
+                        <span class="badge-carrito">@Carrito.CantidadTotal</span>
+                    }
+                </span>
+                <span>Carrito</span>
+            </NavLink>
+            <NavLink href="perfil" ActiveClass="activo"><Icono Nombre="person" /><span>Perfil</span></NavLink>
+        </nav>
+    }
 </div>
 
 <HojaCategorias Visible="mostrarCategorias" OnCerrar="CerrarCategorias" />
 
 @code {
     private bool mostrarCategorias;
+
+    // El checkout y la confirmación son un flujo cerrado: sin barra inferior
+    private bool ocultarNav
+    {
+        get
+        {
+            var ruta = Nav.ToBaseRelativePath(Nav.Uri);
+            return ruta.StartsWith("checkout") || ruta.StartsWith("pedido-confirmado");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Carrito.Cambio += OnCarritoCambio;
+        Auth.AuthenticationStateChanged += OnAuthCambio;
+
+        await Auth.GetAuthenticationStateAsync();   // asegura que la sesión guardada esté cargada
+        await Carrito.RefrescarContadorAsync();
+    }
+
+    private void OnCarritoCambio() => InvokeAsync(StateHasChanged);
+
+    // Al iniciar o cerrar sesión, el contador se recalcula
+    private void OnAuthCambio(Task<AuthenticationState> _) => InvokeAsync(Carrito.RefrescarContadorAsync);
+
     private void CerrarCategorias() => mostrarCategorias = false;
+
+    public void Dispose()
+    {
+        Carrito.Cambio -= OnCarritoCambio;
+        Auth.AuthenticationStateChanged -= OnAuthCambio;
+    }
 }

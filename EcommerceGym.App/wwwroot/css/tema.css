@@ -342,3 +342,320 @@ html, body {
     padding: .75rem 1rem;
     border-radius: 10px;
 }
+
+/* Contador del carrito y barra inferior */
+.icono-con-badge {
+    position: relative;
+    display: inline-flex;
+}
+
+.badge-carrito {
+    position: absolute;
+    top: -5px;
+    right: -11px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--naranja);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contenido.sin-nav {
+    padding-bottom: 1.5rem;
+}
+
+/* Botones y mensajes */
+.btn-bloque {
+    display: block;
+    width: 100%;
+    text-align: center;
+    border: 0;
+    border-radius: 12px;
+    padding: .85rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .btn-bloque:disabled {
+        opacity: .5;
+    }
+
+.btn-oscuro {
+    background: var(--carbon);
+    color: #fff;
+}
+
+.btn-secundario {
+    background: #fff;
+    color: var(--carbon);
+    border: 1px solid #d5d8dd;
+}
+
+.mensaje-ok {
+    background: #e7f6ee;
+    color: #1a7f4b;
+    padding: .75rem 1rem;
+    border-radius: 10px;
+}
+
+    .mensaje-ok a {
+        color: inherit;
+        font-weight: 700;
+    }
+
+.mensaje-error, .mensaje-ok {
+    margin-bottom: .75rem;
+}
+
+.acciones-detalle {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.nota {
+    color: var(--gris-texto);
+    font-size: .85rem;
+    text-align: center;
+    margin: 0 0 1rem;
+}
+
+/* Detalle de producto */
+.detalle-img {
+    aspect-ratio: 4 / 3;
+    background: #e9eaec;
+    color: var(--gris-texto);
+    overflow: hidden;
+    border-radius: var(--radio);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+    .detalle-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.detalle-ruta {
+    color: var(--gris-texto);
+    font-size: .85rem;
+    margin: 0;
+}
+
+.detalle-nombre {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: .15rem 0 .5rem;
+}
+
+.detalle-precio {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-bottom: .75rem;
+}
+
+    .detalle-precio .actual {
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+
+.atributos {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .4rem 1rem;
+    font-size: .9rem;
+    background: #fff;
+    border-radius: var(--radio);
+    padding: .75rem 1rem;
+    margin: 0 0 1rem;
+}
+
+    .atributos dt {
+        color: var(--gris-texto);
+        font-weight: 400;
+    }
+
+    .atributos dd {
+        margin: 0;
+        font-weight: 600;
+    }
+
+.stock-ok {
+    color: #1a7f4b;
+}
+
+/* Selector de cantidad */
+.selector-cantidad {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-radius: 12px;
+    padding: .35rem;
+    margin-bottom: .75rem;
+}
+
+    .selector-cantidad .etiqueta {
+        padding-left: .6rem;
+        color: var(--gris-texto);
+    }
+
+    .selector-cantidad .controles, .cant-mini {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+    }
+
+        .selector-cantidad button, .cant-mini button {
+            width: 40px;
+            height: 40px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--hueso);
+            color: var(--carbon);
+            font-size: 1.3rem;
+        }
+
+        .cant-mini button {
+            width: 32px;
+            height: 32px;
+            font-size: 1.1rem;
+        }
+
+            .selector-cantidad button:disabled, .cant-mini button:disabled {
+                opacity: .4;
+            }
+
+        .selector-cantidad .valor, .cant-mini .valor {
+            min-width: 34px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+/* Carrito */
+.item-carrito {
+    display: flex;
+    gap: .75rem;
+    background: #fff;
+    border-radius: var(--radio);
+    padding: .6rem;
+    margin-bottom: .75rem;
+}
+
+    .item-carrito .mini {
+        width: 84px;
+        height: 84px;
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 10px;
+        background: #e9eaec;
+        color: var(--gris-texto);
+        font-size: .65rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .item-carrito .mini img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .item-carrito .info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+    }
+
+    .item-carrito .fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .item-carrito .nombre {
+        font-weight: 600;
+    }
+
+    .item-carrito .eliminar {
+        color: var(--rojo-oferta);
+        padding: .2rem;
+    }
+
+.resumen {
+    background: #fff;
+    border-radius: var(--radio);
+    padding: .9rem 1rem;
+    margin: 1rem 0;
+}
+
+    .resumen .linea {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: .2rem 0;
+    }
+
+        .resumen .linea.fuerte {
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .resumen .linea.total {
+            font-weight: 800;
+            font-size: 1.15rem;
+            border-top: 1px solid #eee;
+            margin-top: .4rem;
+            padding-top: .6rem;
+        }
+
+/* Formularios */
+.formulario .campo {
+    margin-bottom: .85rem;
+}
+
+.formulario label {
+    display: block;
+    font-size: .9rem;
+    margin-bottom: .25rem;
+}
+
+.formulario input {
+    width: 100%;
+    padding: .7rem .8rem;
+    background: #fff;
+    border: 1px solid #d5d8dd;
+    border-radius: 10px;
+}
+
+/* Confirmación */
+.confirmacion {
+    text-align: center;
+    padding: 1.5rem 0 1rem;
+}
+
+    .confirmacion h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+    }
+
+    .confirmacion .check {
+        color: #1a7f4b;
+        margin: 1rem 0;
+    }

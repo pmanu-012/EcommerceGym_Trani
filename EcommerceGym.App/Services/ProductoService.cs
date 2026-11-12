@@ -22,4 +22,12 @@ public class ProductoService
         var url = "api/productos" + (qs.Count > 0 ? "?" + string.Join("&", qs) : "");
         return await _http.GetFromJsonAsync<List<ProductoDto>>(url) ?? new();
     }
+
+    public async Task<ProductoDetalleDto?> GetDetalleAsync(int id)
+    {
+        var resp = await _http.GetAsync($"api/productos/{id}");
+        if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        resp.EnsureSuccessStatusCode();
+        return await resp.Content.ReadFromJsonAsync<ProductoDetalleDto>();
+    }
 }

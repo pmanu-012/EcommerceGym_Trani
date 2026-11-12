@@ -1,0 +1,18 @@
+﻿@page "/pedido-confirmado/{IdPedido:int}"
+@attribute [Authorize(Roles = "Cliente")]
+
+<div class="confirmacion">
+    <h1>¡Pedido realizado!</h1>
+    <div class="check"><Icono Nombre="check" Tamano="96" /></div>
+    <p>Tu pedido fue registrado correctamente y está siendo procesado.</p>
+    <p>Número de pedido: <strong>@("#" + IdPedido.ToString("D5"))</strong></p>
+</div>
+
+<div class="acciones-detalle">
+    <a class="btn-bloque btn-oscuro" href="mis-pedidos">Ver mis pedidos</a>
+    <a class="btn-bloque btn-secundario" href="/">Volver al inicio</a>
+</div>
+
+@code {
+    [Parameter] public int IdPedido { get; set; }
+}

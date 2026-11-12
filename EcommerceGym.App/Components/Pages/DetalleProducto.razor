@@ -1,0 +1,160 @@
+﻿@page "/producto/{Id:int}"
+@inject ProductoService Productos
+@inject CarritoService Carrito
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<EncabezadoPagina Titulo="Detalle de producto" />
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (producto is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else
+{
+    <div class="detalle-img">
+        @if (!string.IsNullOrWhiteSpace(producto.ImagenUrl))
+        {
+            <img src="@producto.ImagenUrl" alt="@producto.Nombre" />
+        }
+        else
+        {
+            <span>Sin imagen</span>
+        }
+    </div>
+
+    <p class="detalle-ruta">
+        @(producto.Subcategoria == "General" ? producto.Categoria : $"{producto.Categoria} › {producto.Subcategoria}")
+    </p>
+    <h2 class="detalle-nombre">@producto.Nombre</h2>
+
+    <div class="detalle-precio">
+        <span class="actual">@Formato.Precio(producto.PrecioFinal)</span>
+        @if (producto.EnOferta)
+        {
+            <span class="precio-tachado">@Formato.Precio(producto.Precio)</span>
+            <span class="badge-oferta">@(producto.PorcentajeDescuento)% OFF</span>
+        }
+    </div>
+
+    <dl class="atributos">
+        <dt>Disponibilidad</dt>
+        <dd>
+            @if (producto.Stock > 0)
+            {
+                <span class="stock-ok">@(producto.Stock == 1 ? "1 disponible" : $"{producto.Stock} disponibles")</span>
+            }
+            else
+            {
+                <span class="sin-stock">Sin stock</span>
+            }
+        </dd>
+
+        @if (!string.IsNullOrEmpty(producto.Uso))
+        {
+            <dt>Uso</dt>
+            <dd>@Formato.Legible(producto.Uso)</dd>
+        }
+        @if (!string.IsNullOrEmpty(producto.Material))
+        {
+            <dt>Material</dt>
+            <dd>@Formato.Legible(producto.Material)</dd>
+        }
+        @if (producto.Disciplinas.Count > 0)
+        {
+            <dt>Disciplinas</dt>
+            <dd>@string.Join(", ", producto.Disciplinas)</dd>
+        }
+        @if (producto.GruposMusculares.Count > 0)
+        {
+            <dt>Grupos musculares</dt>
+            <dd>@string.Join(", ", producto.GruposMusculares)</dd>
+        }
+    </dl>
+
+    @if (mensajeOk is not null)
+    {
+        <div class="mensaje-ok">@mensajeOk <a href="carrito">Ver carrito</a></div>
+    }
+    @if (errorAccion is not null)
+    {
+        <div class="mensaje-error">@errorAccion</div>
+    }
+
+    @if (Auth.EsAdmin)
+    {
+        <p class="estado-vacio">Los administradores no pueden realizar compras.</p>
+    }
+    else if (producto.Stock > 0)
+    {
+        <div class="selector-cantidad">
+            <span class="etiqueta">Cantidad</span>
+            <div class="controles">
+                <button @onclick="() => Cambiar(-1)" disabled="@(cantidad <= 1)">−</button>
+                <span class="valor">@cantidad</span>
+                <button @onclick="() => Cambiar(1)" disabled="@(cantidad >= producto.Stock)">+</button>
+            </div>
+        </div>
+
+        <div class="acciones-detalle">
+            <button class="btn-bloque btn-oscuro" @onclick="ComprarAhora" disabled="@ocupado">Comprar ahora</button>
+            <button class="btn-bloque btn-secundario" @onclick="Agregar" disabled="@ocupado">Agregar al carrito</button>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private ProductoDetalleDto? producto;
+    private string? error;
+    private string? mensajeOk;
+    private string? errorAccion;
+    private int cantidad = 1;
+    private bool ocupado;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        producto = null; error = null; mensajeOk = null; errorAccion = null; cantidad = 1;
+        try
+        {
+            producto = await Productos.GetDetalleAsync(Id);
+            if (producto is null) error = "El producto no existe.";
+        }
+        catch (Exception)
+        {
+            error = "No se pudo cargar el producto. Verificá tu conexión e intentá de nuevo.";
+        }
+    }
+
+    private void Cambiar(int delta) =>
+        cantidad = Math.Clamp(cantidad + delta, 1, Math.Max(1, producto!.Stock));
+
+    private async Task<bool> AgregarAlCarritoAsync()
+    {
+        // Para comprar hay que haber iniciado sesión
+        if (!Auth.EstaAutenticado)
+        {
+            Nav.NavigateTo("login");
+            return false;
+        }
+
+        ocupado = true; mensajeOk = null;
+        errorAccion = await Carrito.AgregarAsync(producto!.IdProducto, cantidad);
+        ocupado = false;
+
+        if (errorAccion is null) mensajeOk = "Producto agregado al carrito.";
+        return errorAccion is null;
+    }
+
+    private async Task Agregar() => await AgregarAlCarritoAsync();
+
+    private async Task ComprarAhora()
+    {
+        if (await AgregarAlCarritoAsync()) Nav.NavigateTo("carrito");
+    }
+}

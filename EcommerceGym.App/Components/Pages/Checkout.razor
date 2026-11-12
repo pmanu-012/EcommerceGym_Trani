@@ -1,0 +1,108 @@
+﻿@page "/checkout"
+@attribute [Authorize(Roles = "Cliente")]
+@inject CarritoService Carrito
+@inject PedidoService Pedidos
+@inject NavigationManager Nav
+
+<EncabezadoPagina Titulo="Checkout" />
+
+@if (!cargado)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (errorCarga is not null)
+{
+    <div class="mensaje-error">@errorCarga</div>
+}
+else if (Carrito.Actual.Items.Count == 0)
+{
+    <p class="estado-vacio">Tu carrito está vacío.</p>
+    <a class="btn-bloque btn-oscuro" href="/">Ir al inicio</a>
+}
+else
+{
+    <EditForm Model="modelo" OnValidSubmit="Confirmar" class="formulario">
+        <DataAnnotationsValidator />
+
+        <h2 class="titulo-seccion">Dirección de envío</h2>
+
+        <div class="campo">
+            <label>Calle</label>
+            <InputText @bind-Value="modelo.Calle" />
+            <ValidationMessage For="() => modelo.Calle" />
+        </div>
+        <div class="campo">
+            <label>Número</label>
+            <InputText @bind-Value="modelo.Numero" />
+            <ValidationMessage For="() => modelo.Numero" />
+        </div>
+        <div class="campo">
+            <label>Ciudad</label>
+            <InputText @bind-Value="modelo.Ciudad" />
+            <ValidationMessage For="() => modelo.Ciudad" />
+        </div>
+        <div class="campo">
+            <label>Provincia</label>
+            <InputText @bind-Value="modelo.Provincia" />
+            <ValidationMessage For="() => modelo.Provincia" />
+        </div>
+        <div class="campo">
+            <label>Código postal</label>
+            <InputText @bind-Value="modelo.CodigoPostal" />
+            <ValidationMessage For="() => modelo.CodigoPostal" />
+        </div>
+
+        <h2 class="titulo-seccion">Resumen</h2>
+        <div class="resumen">
+            @foreach (var i in Carrito.Actual.Items)
+            {
+                <div class="linea"><span>@i.Nombre × @i.Cantidad</span><span>@Formato.Precio(i.Subtotal)</span></div>
+            }
+            <div class="linea"><span>Costo de envío</span><span>@Formato.Precio(Tienda.CostoEnvio)</span></div>
+            <div class="linea total">
+                <span>Total</span>
+                <span>@Formato.Precio(Carrito.Actual.Total + Tienda.CostoEnvio)</span>
+            </div>
+        </div>
+
+        @if (error is not null)
+        {
+            <div class="mensaje-error">@error</div>
+        }
+
+        <button type="submit" class="btn-accent btn-bloque" disabled="@enviando">Realizar pedido</button>
+    </EditForm>
+}
+
+@code {
+    private readonly CheckoutDto modelo = new();
+    private bool cargado;
+    private bool enviando;
+    private string? error;
+    private string? errorCarga;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { await Carrito.ObtenerAsync(); }
+        catch (Exception) { errorCarga = "No se pudo cargar tu carrito. Verificá tu conexión e intentá de nuevo."; }
+        cargado = true;
+    }
+
+    private async Task Confirmar()
+    {
+        enviando = true;
+        error = null;
+
+        var (pedido, mensaje) = await Pedidos.CrearAsync(modelo);
+        enviando = false;
+
+        if (pedido is null)
+        {
+            error = mensaje;
+            return;
+        }
+
+        await Carrito.RefrescarContadorAsync();   // el servidor vació el carrito
+        Nav.NavigateTo($"pedido-confirmado/{pedido.IdPedido}");
+    }
+}

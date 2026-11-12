@@ -1,6 +1,7 @@
-﻿using EcommerceGym.App.Services;
-using Microsoft.Extensions.Logging;
+﻿// using Android.Service.Carrier;
+using EcommerceGym.App.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace EcommerceGym.App
 {
@@ -29,6 +30,8 @@ namespace EcommerceGym.App
             builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(ApiConfig.BaseUrl) });
             builder.Services.AddScoped<ProductoService>();
             builder.Services.AddSingleton<CategoriaService>();
+            builder.Services.AddSingleton<CarritoService>();
+            builder.Services.AddScoped<PedidoService>();
             return builder.Build();
         }
     }

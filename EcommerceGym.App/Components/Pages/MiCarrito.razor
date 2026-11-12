@@ -1,0 +1,94 @@
+﻿@page "/carrito"
+@attribute [Authorize(Roles = "Cliente")]
+@inject CarritoService Carrito
+
+<EncabezadoPagina Titulo="Mi carrito" MostrarVolver="false" />
+
+@if (errorCarga is not null)
+{
+    <div class="mensaje-error">@errorCarga</div>
+}
+else if (!cargado)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (Carrito.Actual.Items.Count == 0)
+{
+    <p class="estado-vacio">Tu carrito está vacío.</p>
+    <a class="btn-accent btn-bloque" href="/">Explorar productos</a>
+}
+else
+{
+    @if (error is not null)
+    {
+        <div class="mensaje-error">@error</div>
+    }
+
+    @foreach (var item in Carrito.Actual.Items)
+    {
+        <div class="item-carrito">
+            <div class="mini">
+                @if (!string.IsNullOrWhiteSpace(item.ImagenUrl))
+                {
+                    <img src="@item.ImagenUrl" alt="@item.Nombre" />
+                }
+                else
+                {
+                    <span>Sin imagen</span>
+                }
+            </div>
+            <div class="info">
+                <div class="fila">
+                    <span class="nombre">@item.Nombre</span>
+                    <button class="icon-btn eliminar" @onclick="() => Eliminar(item)" disabled="@ocupado" aria-label="Eliminar">
+                        <Icono Nombre="delete" />
+                    </button>
+                </div>
+                <span class="precio">@Formato.Precio(item.PrecioUnitario)</span>
+                <div class="fila">
+                    <div class="cant-mini">
+                        <button @onclick="() => Cambiar(item, -1)" disabled="@(item.Cantidad <= 1 || ocupado)">−</button>
+                        <span class="valor">@item.Cantidad</span>
+                        <button @onclick="() => Cambiar(item, 1)" disabled="@(item.Cantidad >= item.Stock || ocupado)">+</button>
+                    </div>
+                    <span class="precio">@Formato.Precio(item.Subtotal)</span>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="resumen">
+        <div class="linea fuerte"><span>Subtotal</span><span>@Formato.Precio(Carrito.Actual.Total)</span></div>
+    </div>
+    <p class="nota">El costo de envío se suma en el checkout.</p>
+
+    <a class="btn-accent btn-bloque" href="checkout">Confirmar compra</a>
+}
+
+@code {
+    private bool cargado;
+    private bool ocupado;
+    private string? error;
+    private string? errorCarga;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { await Carrito.ObtenerAsync(); }
+        catch (Exception) { errorCarga = "No se pudo cargar tu carrito. Verificá tu conexión e intentá de nuevo."; }
+        cargado = true;
+    }
+
+    private async Task Cambiar(CarritoItemDto item, int delta)
+    {
+        ocupado = true;
+        error = await Carrito.ActualizarAsync(item.IdCarritoItem, item.Cantidad + delta);
+        ocupado = false;
+    }
+
+    private async Task Eliminar(CarritoItemDto item)
+    {
+        ocupado = true;
+        error = await Carrito.EliminarAsync(item.IdCarritoItem);
+        ocupado = false;
+    }
+}

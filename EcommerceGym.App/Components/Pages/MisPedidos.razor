@@ -1,0 +1,47 @@
+﻿@page "/mis-pedidos"
+@attribute [Authorize(Roles = "Cliente")]
+@inject PedidoService Pedidos
+
+<EncabezadoPagina Titulo="Mis pedidos" />
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (lista is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (lista.Count == 0)
+{
+    <p class="estado-vacio">Todavía no realizaste ningún pedido.</p>
+    <a class="btn-accent btn-bloque" href="/">Explorar productos</a>
+}
+else
+{
+    @foreach (var p in lista)
+    {
+        <a class="card-pedido" href="pedido/@p.IdPedido">
+            <div class="fila">
+                <span class="numero">@Formato.NumeroPedido(p.IdPedido)</span>
+                <EstadoBadge Estado="p.Estado" />
+            </div>
+            <span class="fecha">@Formato.Fecha(p.Fecha)</span>
+            <div class="fila">
+                <span class="total">Total: @Formato.Precio(p.Total)</span>
+                <span class="ver-detalle">Ver detalle ›</span>
+            </div>
+        </a>
+    }
+}
+
+@code {
+    private List<PedidoResumenDto>? lista;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { lista = await Pedidos.MisPedidosAsync(); }
+        catch (Exception) { error = "No se pudieron cargar tus pedidos. Verificá tu conexión e intentá de nuevo."; }
+    }
+}

@@ -5,7 +5,7 @@
     <h1>¡Pedido realizado!</h1>
     <div class="check"><Icono Nombre="check" Tamano="96" /></div>
     <p>Tu pedido fue registrado correctamente y está siendo procesado.</p>
-    <p>Número de pedido: <strong>@("#" + IdPedido.ToString("D5"))</strong></p>
+    <p>Número de pedido: <strong>@Formato.NumeroPedido(IdPedido)</strong></p>
 </div>
 
 <div class="acciones-detalle">

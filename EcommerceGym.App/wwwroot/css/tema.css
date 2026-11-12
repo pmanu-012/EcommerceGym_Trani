@@ -659,3 +659,161 @@ html, body {
         color: #1a7f4b;
         margin: 1rem 0;
     }
+
+/* Pedidos */
+.card-pedido {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    background: #fff;
+    border-radius: var(--radio);
+    padding: .85rem 1rem;
+    margin-bottom: .75rem;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+    .card-pedido .fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-pedido .numero {
+        font-weight: 700;
+    }
+
+    .card-pedido .fecha {
+        color: var(--gris-texto);
+        font-size: .85rem;
+    }
+
+    .card-pedido .total {
+        font-weight: 600;
+    }
+
+    .card-pedido .ver-detalle {
+        color: var(--naranja);
+        font-weight: 600;
+        font-size: .9rem;
+    }
+
+.estado {
+    display: inline-block;
+    font-size: .75rem;
+    font-weight: 700;
+    color: #fff;
+    padding: .2rem .65rem;
+    border-radius: 999px;
+}
+
+.estado-pendiente {
+    background: #F5B400;
+    color: #3b2f00;
+}
+
+.estado-confirmado {
+    background: #14B8D6;
+}
+
+.estado-enviado {
+    background: #2F7DF6;
+}
+
+.estado-entregado {
+    background: #22A559;
+}
+
+/* Detalle de pedido */
+.bloque {
+    background: #fff;
+    border-radius: var(--radio);
+    padding: .9rem 1rem;
+    margin-bottom: .75rem;
+}
+
+    .bloque h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 .6rem;
+    }
+
+    .bloque .atributos {
+        background: none;
+        padding: 0;
+        margin: 0;
+    }
+
+.item-pedido {
+    padding: .5rem 0;
+    border-top: 1px solid #eee;
+}
+
+    .item-pedido:first-of-type {
+        border-top: 0;
+    }
+
+    .item-pedido .nombre {
+        display: block;
+        font-weight: 600;
+    }
+
+    .item-pedido .linea {
+        display: flex;
+        justify-content: space-between;
+        color: var(--gris-texto);
+        font-size: .9rem;
+    }
+
+/* Perfil */
+.perfil-cabecera {
+    text-align: center;
+    padding: 1rem 0 1.25rem;
+}
+
+    .perfil-cabecera h1 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        margin: .9rem 0 .15rem;
+    }
+
+    .perfil-cabecera .email {
+        color: var(--gris-texto);
+        margin: 0 0 .5rem;
+    }
+
+.badge-rol {
+    background: var(--carbon);
+    color: #fff;
+    font-size: .75rem;
+    padding: .2rem .7rem;
+    border-radius: 999px;
+}
+
+.fila-menu {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .6rem;
+    background: #fff;
+    border-radius: 12px;
+    padding: .9rem 1rem;
+    color: var(--carbon);
+    text-decoration: none;
+}
+
+    .fila-menu span {
+        flex: 1;
+        font-weight: 600;
+    }
+
+    .fila-menu svg:last-child {
+        color: var(--gris-texto);
+    }
+
+.btn-peligro {
+    background: var(--rojo-oferta);
+    color: #fff;
+    margin-top: 1.25rem;
+}

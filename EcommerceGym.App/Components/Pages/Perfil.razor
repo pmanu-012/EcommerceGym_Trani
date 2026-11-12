@@ -3,14 +3,23 @@
 @inject AuthService Auth
 @inject NavigationManager Nav
 
-<div class="text-center py-4">
+<div class="perfil-cabecera">
     <div class="avatar"><Icono Nombre="person" Tamano="56" /></div>
-    <h1 class="h5 mt-3">@Auth.Sesion?.Nombre @Auth.Sesion?.Apellido</h1>
-    <p class="text-secondary mb-1">@Auth.Sesion?.Email</p>
-    <span class="badge text-bg-dark">@Auth.Sesion?.Rol</span>
+    <h1>@Auth.Sesion?.Nombre @Auth.Sesion?.Apellido</h1>
+    <p class="email">@Auth.Sesion?.Email</p>
+    <span class="badge-rol">@Auth.Sesion?.Rol</span>
 </div>
 
-<button class="btn btn-danger w-100 py-2" @onclick="Salir">Cerrar sesión</button>
+@if (!Auth.EsAdmin)
+{
+    <a class="fila-menu" href="mis-pedidos">
+        <Icono Nombre="pedidos" />
+        <span>Mis pedidos</span>
+        <Icono Nombre="chevron" />
+    </a>
+}
+
+<button class="btn-bloque btn-peligro" @onclick="Salir">Cerrar sesión</button>
 
 @code {
     private async Task Salir()

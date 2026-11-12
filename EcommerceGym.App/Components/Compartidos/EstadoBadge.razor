@@ -1,0 +1,7 @@
+﻿@using EcommerceGym.Shared.Enums
+
+<span class="estado estado-@Estado.ToString().ToLower()">@Estado</span>
+
+@code {
+    [Parameter, EditorRequired] public EstadoPedido Estado { get; set; }
+}

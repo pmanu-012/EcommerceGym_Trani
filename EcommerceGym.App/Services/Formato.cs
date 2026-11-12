@@ -17,4 +17,7 @@ public static class Formato
          null => string.Empty,
          _ => valor
     };
+    public static string Fecha(DateTime fecha) => fecha.ToString("dd/MM/yyyy", Es);
+
+    public static string NumeroPedido(int id) => "#" + id.ToString("D5");
 }

@@ -1,0 +1,105 @@
+﻿@page "/admin/usuarios"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+@inject AuthService Auth
+
+<EncabezadoPagina Titulo="Usuarios" MostrarVolver="false" />
+
+<form class="buscador" @onsubmit="Cargar">
+    <input type="search" placeholder="Buscar por nombre o email..." @bind="texto" />
+    <button class="btn-accent" type="submit">Buscar</button>
+</form>
+
+@if (mensajeOk is not null)
+{
+    <div class="mensaje-ok">@mensajeOk</div>
+}
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+
+@if (lista is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (lista.Count == 0)
+{
+    <p class="estado-vacio">No se encontraron usuarios.</p>
+}
+else
+{
+    @foreach (var u in lista)
+    {
+        <div class="fila-admin @(u.Activo ? null : "inactivo")">
+            <div class="mini redondo"><Icono Nombre="person" Tamano="28" /></div>
+            <div class="datos">
+                <span class="nombre">@u.Nombre @u.Apellido</span>
+                <span class="sub">@u.Email</span>
+                <span class="sub">
+                    <span class="badge-rol">@u.Rol</span>
+                    @if (!u.Activo)
+                    {
+                        <span class="etiqueta-baja">De baja</span>
+                    }
+                </span>
+            </div>
+            <div class="acciones-fila">
+                <a class="icon-btn" href="admin/usuarios/@u.IdUsuario" aria-label="Editar"><Icono Nombre="edit" /></a>
+                @if (u.Activo && u.IdUsuario != Auth.Sesion?.IdUsuario)
+                {
+                    <button class="icon-btn peligro" @onclick="() => aBaja = u" aria-label="Dar de baja"><Icono Nombre="delete" /></button>
+                }
+            </div>
+        </div>
+    }
+}
+
+<ConfirmDialog Visible="aBaja is not null"
+               Titulo="Dar de baja"
+               Mensaje="@($"¿Querés dar de baja a {aBaja?.Nombre} {aBaja?.Apellido}? No podrá volver a iniciar sesión, pero se conserva su historial.")"
+               TextoConfirmar="Dar de baja"
+               ClaseConfirmar="btn-peligro"
+               Ocupado="ocupado"
+               OnConfirmar="DarDeBaja"
+               OnCancelar="() => aBaja = null" />
+
+@code {
+    private List<UsuarioDto>? lista;
+    private UsuarioDto? aBaja;
+    private string texto = string.Empty;
+    private string? error;
+    private string? mensajeOk;
+    private bool ocupado;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        error = null;
+        try { lista = await Admin.UsuariosAsync(texto); }
+        catch (Exception) { error = "No se pudieron cargar los usuarios. Verificá tu conexión e intentá de nuevo."; }
+    }
+
+    private async Task DarDeBaja()
+    {
+        if (aBaja is null) return;
+
+        ocupado = true; error = null; mensajeOk = null;
+        var mensaje = await Admin.DarDeBajaAsync(aBaja.IdUsuario);
+        ocupado = false;
+
+        if (mensaje is null)
+        {
+            mensajeOk = $"{aBaja.Nombre} {aBaja.Apellido} fue dado de baja.";
+            aBaja = null;
+            await Cargar();
+        }
+        else
+        {
+            error = mensaje;
+            aBaja = null;
+        }
+    }
+}

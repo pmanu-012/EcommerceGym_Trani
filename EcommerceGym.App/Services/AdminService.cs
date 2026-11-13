@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Json;
-using EcommerceGym.Shared.DTOs;
+﻿using EcommerceGym.Shared.DTOs;
 using EcommerceGym.Shared.Enums;
+using System.Net.Http.Json;
 
 namespace EcommerceGym.App.Services;
 
@@ -60,8 +60,34 @@ public class AdminService
     public async Task<List<OpcionDto>> GruposMuscularesAsync() =>
         _grupos ??= await _http.GetFromJsonAsync<List<OpcionDto>>("api/catalogos/grupos-musculares") ?? new();
 
-    // Devuelve null si salió bien, o el mensaje de error
-    private static async Task<string?> EjecutarAsync(Func<Task<HttpResponseMessage>> peticion)
+     // ---------- Estadísticas ----------
+    public async Task<EstadisticasDto> EstadisticasAsync(int umbralStock) =>
+        await _http.GetFromJsonAsync<EstadisticasDto>($"api/estadisticas?umbralStock={umbralStock}") ?? new();
+
+     // ---------- Usuarios ----------
+    public async Task<List<UsuarioDto>> UsuariosAsync(string? buscar = null)
+    {
+        var url = "api/usuarios" +
+        (string.IsNullOrWhiteSpace(buscar) ? "" : $"?buscar={Uri.EscapeDataString(buscar)}");
+        return await _http.GetFromJsonAsync<List<UsuarioDto>>(url) ?? new ();
+    }
+
+    public async Task<UsuarioDto?> GetUsuarioAsync(int id)
+    {
+        var resp = await _http.GetAsync($"api/usuarios/{id}");
+        if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        resp.EnsureSuccessStatusCode();
+        return await resp.Content.ReadFromJsonAsync<UsuarioDto>();
+    }
+
+    public Task<string?> EditarUsuarioAsync(int id, UsuarioEditDto dto) =>
+        EjecutarAsync(() => _http.PutAsJsonAsync($"api/usuarios/{id}", dto));
+
+    public Task<string?> DarDeBajaAsync(int id) =>
+        EjecutarAsync(() => _http.DeleteAsync($"api/usuarios/{id}"));
+
+// Devuelve null si salió bien, o el mensaje de error
+private static async Task<string?> EjecutarAsync(Func<Task<HttpResponseMessage>> peticion)
     {
         try
         {

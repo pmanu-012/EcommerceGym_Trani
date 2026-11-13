@@ -262,3 +262,11 @@ Authorization: Bearer {{login.response.body.$.token}}
 ### El admin no puede darse de baja (400): usá su propio id
 DELETE {{host}}/api/usuarios/1
 Authorization: Bearer {{login.response.body.$.token}}
+
+### Estadísticas
+GET {{host}}/api/estadisticas?umbralStock=10
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Un cliente no puede (403)
+GET {{host}}/api/estadisticas
+Authorization: Bearer {{loginCliente.response.body.$.token}}

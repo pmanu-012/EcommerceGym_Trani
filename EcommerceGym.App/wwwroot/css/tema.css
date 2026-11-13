@@ -1041,3 +1041,154 @@ html, body {
     padding: .3rem .75rem;
     font-size: .9rem;
 }
+
+/* Estadísticas */
+.cards-resumen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+}
+
+.card-numero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .25rem;
+    background: #fff;
+    border-radius: var(--radio);
+    padding: .9rem .5rem;
+}
+
+    .card-numero .etiqueta {
+        color: var(--gris-texto);
+        font-size: .8rem;
+    }
+
+    .card-numero .valor {
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+.nota-chica {
+    color: var(--gris-texto);
+    font-size: .8rem;
+    margin: .5rem 0 1rem;
+}
+
+.vacio-chico {
+    color: var(--gris-texto);
+    font-size: .9rem;
+    margin: 0;
+}
+
+.ranking-fila {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .45rem 0;
+    border-top: 1px solid #eee;
+}
+
+.bloque h2 + .ranking-fila {
+    border-top: 0;
+}
+
+.ranking-fila .pos {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--carbon);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ranking-fila .nombre {
+    flex: 1;
+    min-width: 0;
+}
+
+.ranking-fila .dato {
+    color: var(--gris-texto);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.categoria-lider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .15rem;
+    background: var(--hueso);
+    border-radius: 10px;
+    padding: .9rem;
+}
+
+    .categoria-lider strong {
+        font-size: 1.25rem;
+    }
+
+    .categoria-lider span {
+        color: var(--gris-texto);
+        font-size: .85rem;
+    }
+
+.umbral {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .6rem;
+    font-size: .9rem;
+}
+
+    .umbral input {
+        width: 72px;
+        padding: .35rem .5rem;
+        text-align: center;
+        border: 1px solid #d5d8dd;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+.stock-badge {
+    font-size: .75rem;
+    font-weight: 700;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+    .stock-badge.aviso {
+        background: #F5B400;
+        color: #3b2f00;
+    }
+
+    .stock-badge.critico {
+        background: var(--rojo-oferta);
+        color: #fff;
+    }
+
+/* Usuarios */
+.fila-admin.inactivo {
+    opacity: .6;
+}
+
+.fila-admin .mini.redondo {
+    border-radius: 50%;
+    background: var(--grafito);
+    color: #fff;
+}
+
+.etiqueta-baja {
+    margin-left: .35rem;
+    padding: .1rem .5rem;
+    border-radius: 999px;
+    background: #fde8ea;
+    color: var(--rojo-oferta);
+    font-size: .7rem;
+    font-weight: 700;
+}

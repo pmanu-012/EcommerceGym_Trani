@@ -1,0 +1,109 @@
+﻿@page "/admin/usuarios/{Id:int}"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<EncabezadoPagina Titulo="Editar usuario" />
+
+@if (modelo is null && error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (modelo is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else
+{
+    <p class="cliente-linea">Rol: <span class="badge-rol">@rol</span></p>
+
+    <EditForm Model="modelo" OnValidSubmit="Guardar" class="formulario">
+        <DataAnnotationsValidator />
+
+        <div class="campo">
+            <label>Nombre</label>
+            <InputText @bind-Value="modelo.Nombre" />
+            <ValidationMessage For="() => modelo.Nombre" />
+        </div>
+        <div class="campo">
+            <label>Apellido</label>
+            <InputText @bind-Value="modelo.Apellido" />
+            <ValidationMessage For="() => modelo.Apellido" />
+        </div>
+        <div class="campo">
+            <label>Teléfono</label>
+            <InputText @bind-Value="modelo.Telefono" inputmode="tel" />
+            <ValidationMessage For="() => modelo.Telefono" />
+        </div>
+        <div class="campo">
+            <label>Email</label>
+            <InputText @bind-Value="modelo.Email" inputmode="email" />
+            <ValidationMessage For="() => modelo.Email" />
+        </div>
+        <div class="campo">
+            <label class="check">
+                <InputCheckbox @bind-Value="modelo.Activo" disabled="@esPropio" />
+                <span>Cuenta activa</span>
+            </label>
+            @if (esPropio)
+            {
+                <p class="nota-chica">No podés dar de baja tu propia cuenta.</p>
+            }
+        </div>
+
+        @if (error is not null)
+        {
+            <div class="mensaje-error">@error</div>
+        }
+
+        <div class="acciones-detalle">
+            <button type="submit" class="btn-bloque btn-oscuro" disabled="@guardando">Guardar cambios</button>
+            <a class="btn-bloque btn-secundario" href="admin/usuarios">Cancelar</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private UsuarioEditDto? modelo;
+    private string rol = string.Empty;
+    private bool guardando;
+    private string? error;
+
+    private bool esPropio => Auth.Sesion?.IdUsuario == Id;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var u = await Admin.GetUsuarioAsync(Id);
+            if (u is null)
+            {
+                error = "El usuario no existe.";
+                return;
+            }
+
+            rol = u.Rol;
+            modelo = new UsuarioEditDto
+            {
+                Nombre = u.Nombre, Apellido = u.Apellido,
+                Telefono = u.Telefono, Email = u.Email, Activo = u.Activo
+            };
+        }
+        catch (Exception)
+        {
+            error = "No se pudo cargar el usuario. Verificá tu conexión e intentá de nuevo.";
+        }
+    }
+
+    private async Task Guardar()
+    {
+        guardando = true; error = null;
+        error = await Admin.EditarUsuarioAsync(Id, modelo!);
+        guardando = false;
+        if (error is null) Nav.NavigateTo("admin/usuarios");
+    }
+}

@@ -20,4 +20,6 @@ public static class Formato
     public static string Fecha(DateTime fecha) => fecha.ToString("dd/MM/yyyy", Es);
 
     public static string NumeroPedido(int id) => "#" + id.ToString("D5");
+
+    public static string Promedio(double valor) => valor.ToString("0.0", Es);
 }

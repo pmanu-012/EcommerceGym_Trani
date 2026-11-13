@@ -1,0 +1,120 @@
+﻿@page "/admin/estadisticas"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+
+<EncabezadoPagina Titulo="Estadísticas" MostrarVolver="false" />
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (datos is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else
+{
+    <div class="cards-resumen">
+        <div class="card-numero">
+            <span class="etiqueta">Ventas de hoy</span>
+            <span class="valor">@Formato.Precio(datos.VentasHoy)</span>
+        </div>
+        <div class="card-numero">
+            <span class="etiqueta">Ventas del mes</span>
+            <span class="valor">@Formato.Precio(datos.VentasMes)</span>
+        </div>
+    </div>
+    <p class="nota-chica">Se cuentan los pedidos confirmados, enviados y entregados.</p>
+
+    <section class="bloque">
+        <h2>Productos más vendidos</h2>
+        @if (datos.MasVendidos.Count == 0)
+        {
+            <p class="vacio-chico">Todavía no hay ventas.</p>
+        }
+        else
+        {
+            @for (var i = 0; i < datos.MasVendidos.Count; i++)
+            {
+                var p = datos.MasVendidos[i];
+                <div class="ranking-fila">
+                    <span class="pos">@(i + 1)</span>
+                    <span class="nombre">@p.Nombre</span>
+                    <span class="dato">@p.Unidades u.</span>
+                </div>
+            }
+        }
+    </section>
+
+    <section class="bloque">
+        <h2>Categoría más vendida</h2>
+        @if (datos.CategoriaLider is null)
+        {
+            <p class="vacio-chico">Todavía no hay ventas.</p>
+        }
+        else
+        {
+            <div class="categoria-lider">
+                <strong>@datos.CategoriaLider.Nombre</strong>
+                <span>@datos.CategoriaLider.Unidades unidades vendidas</span>
+            </div>
+        }
+    </section>
+
+    <section class="bloque">
+        <h2>Mejor valorados</h2>
+        @if (datos.MejorValorados.Count == 0)
+        {
+            <p class="vacio-chico">Todavía no hay reseñas.</p>
+        }
+        else
+        {
+            @foreach (var p in datos.MejorValorados)
+            {
+                <div class="ranking-fila">
+                    <span class="nombre">@p.Nombre</span>
+                    <span class="dato">★ @Formato.Promedio(p.Promedio) (@p.Cantidad)</span>
+                </div>
+            }
+        }
+    </section>
+
+    <section class="bloque">
+        <h2>Stock bajo</h2>
+        <div class="umbral">
+            <span>Productos con hasta</span>
+            <input type="number" min="0" max="1000" @bind="umbral" @bind:after="Cargar" />
+            <span>unidades</span>
+        </div>
+        @if (datos.StockBajo.Count == 0)
+        {
+            <p class="vacio-chico">No hay productos con ese nivel de stock.</p>
+        }
+        else
+        {
+            @foreach (var p in datos.StockBajo)
+            {
+                <div class="ranking-fila">
+                    <span class="nombre">@p.Nombre</span>
+                    <span class="stock-badge @(p.Stock <= 3 ? "critico" : "aviso")">@p.Stock u.</span>
+                </div>
+            }
+        }
+    </section>
+}
+
+@code {
+    private EstadisticasDto? datos;
+    private int umbral = 10;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        error = null;
+        try { datos = await Admin.EstadisticasAsync(umbral); }
+        catch (Exception) { error = "No se pudieron cargar las estadísticas. Verificá tu conexión e intentá de nuevo."; }
+    }
+}

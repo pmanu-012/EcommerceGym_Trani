@@ -163,3 +163,102 @@ Content-Type: application/json
 ###
 GET {{host}}/api/pedidos/{{pedido.response.body.$.idPedido}}
 Authorization: Bearer {{loginJuan.response.body.$.token}}
+
+### Pedidos (admin)
+GET {{host}}/api/pedidos
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Confirmar un pedido Pendiente (cambiá el 1 por uno de tu lista)
+PUT {{host}}/api/pedidos/1/estado
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "estado": "Confirmado" }
+
+### Saltar un estado (400)
+PUT {{host}}/api/pedidos/1/estado
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "estado": "Entregado" }
+
+### Un cliente no puede cambiar estados (403)
+PUT {{host}}/api/pedidos/1/estado
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "estado": "Enviado" }
+
+### Catálogos
+GET {{host}}/api/catalogos/disciplinas
+
+###
+GET {{host}}/api/catalogos/grupos-musculares
+
+### Crear producto (idSubcategoria: confirmá el id en /api/categorias)
+# @name nuevo
+POST {{host}}/api/productos
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "nombre": "Soga de saltar",
+  "precio": 12000,
+  "precioOferta": null,
+  "stock": 25,
+  "imagenUrl": null,
+  "uso": "Mixto",
+  "material": "Otro",
+  "idSubcategoria": 11,
+  "idDisciplinas": [4],
+  "idGruposMusculares": [3,6]
+}
+
+### Datos para editar
+GET {{host}}/api/productos/{{nuevo.response.body.$.idProducto}}/edicion
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Editar: precio con oferta
+PUT {{host}}/api/productos/{{nuevo.response.body.$.idProducto}}
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "idProducto": 0,
+  "nombre": "Soga de saltar",
+  "precio": 12000,
+  "precioOferta": 9000,
+  "stock": 25,
+  "imagenUrl": null,
+  "uso": "Mixto",
+  "material": "Otro",
+  "idSubcategoria": 11,
+  "idDisciplinas": [4],
+  "idGruposMusculares": [3, 6]
+}
+
+### Oferta mayor al precio (400)
+PUT {{host}}/api/productos/{{nuevo.response.body.$.idProducto}}
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "nombre": "Soga de saltar", "precio": 12000, "precioOferta": 15000, "stock": 25, "idSubcategoria": 11 }
+
+### Baja del producto
+DELETE {{host}}/api/productos/{{nuevo.response.body.$.idProducto}}
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Un cliente no puede crear productos (403)
+POST {{host}}/api/productos
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "nombre": "x", "precio": 1, "stock": 1, "idSubcategoria": 1 }
+
+### Usuarios
+GET {{host}}/api/usuarios?buscar=juan
+Authorization: Bearer {{login.response.body.$.token}}
+
+### El admin no puede darse de baja (400): usá su propio id
+DELETE {{host}}/api/usuarios/1
+Authorization: Bearer {{login.response.body.$.token}}

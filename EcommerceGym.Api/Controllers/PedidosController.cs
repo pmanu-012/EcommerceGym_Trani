@@ -7,6 +7,7 @@ using EcommerceGym.Shared.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using EcommerceGym.Api.Services;
 
 namespace EcommerceGym.Api.Controllers;
 
@@ -16,7 +17,12 @@ namespace EcommerceGym.Api.Controllers;
 public class PedidosController : ControllerBase
 {
     private readonly AppDbContext _db;
-    public PedidosController(AppDbContext db) => _db = db;
+    private readonly AuditoriaService _auditoria;
+    public PedidosController(AppDbContext db, AuditoriaService auditoria)
+    {
+        _db = db;
+        _auditoria = auditoria;
+    }
 
     private int UsuarioId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
@@ -110,7 +116,78 @@ public class PedidosController : ControllerBase
 
         return ToDto(pedido);
     }
+    // Lista de todos los pedidos (administrador). "buscar": número de pedido o nombre del cliente
+    [HttpGet]
+    [Authorize(Roles = "Administrador")]
+    public async Task<ActionResult<List<PedidoAdminDto>>> Listar(string? buscar)
+    {
+        var query = _db.Pedidos.AsNoTracking();
 
+        if (!string.IsNullOrWhiteSpace(buscar))
+        {
+            var texto = buscar.Trim().TrimStart('#');
+            if (int.TryParse(texto, out var numero))
+                query = query.Where(p => p.IdPedido == numero);
+            else
+                query = query.Where(p => (p.Usuario.Nombre + " " + p.Usuario.Apellido).Contains(texto));
+        }
+
+        return await query
+            .OrderByDescending(p => p.Fecha)
+            .Select(p => new PedidoAdminDto
+            {
+                IdPedido = p.IdPedido,
+                Fecha = p.Fecha,
+                Estado = p.Estado,
+                Total = p.Total,
+                Cliente = p.Usuario.Nombre + " " + p.Usuario.Apellido
+            })
+            .ToListAsync();
+    }
+
+    // El estado solo avanza de a un paso: Pendiente → Confirmado → Enviado → Entregado.
+    // Al confirmar, el sistema valida y descuenta el stock.
+    [HttpPut("{id:int}/estado")]
+    [Authorize(Roles = "Administrador")]
+    public async Task<ActionResult<PedidoDto>> CambiarEstado(int id, CambiarEstadoDto dto)
+    {
+        var pedido = await _db.Pedidos
+            .Include(p => p.Detalles).ThenInclude(d => d.Producto)
+            .FirstOrDefaultAsync(p => p.IdPedido == id);
+
+        if (pedido is null)
+            return NotFound(new { mensaje = "El pedido no existe." });
+
+        if (pedido.Estado == EstadoPedido.Entregado)
+            return BadRequest(new { mensaje = "El pedido ya fue entregado y no admite más cambios." });
+
+        var siguiente = pedido.Estado + 1;
+        if (dto.Estado != siguiente)
+            return BadRequest(new { mensaje = $"El pedido está {pedido.Estado}; el siguiente estado válido es {siguiente}." });
+
+        if (siguiente == EstadoPedido.Confirmado)
+        {
+            foreach (var d in pedido.Detalles)
+            {
+                if (d.Cantidad > d.Producto.Stock)
+                    return BadRequest(new
+                    {
+                        mensaje = $"Stock insuficiente para \"{d.Producto.Nombre}\". Pedido: {d.Cantidad}, disponible: {d.Producto.Stock}."
+                    });
+            }
+
+            foreach (var d in pedido.Detalles)
+                d.Producto.Stock -= d.Cantidad;
+        }
+
+        _auditoria.Registrar(UsuarioId, AccionAuditoria.Modificar, "Pedido", pedido.IdPedido,
+            new { Estado = pedido.Estado.ToString() }, new { Estado = siguiente.ToString() });
+
+        pedido.Estado = siguiente;
+        await _db.SaveChangesAsync();   // estado, stock y auditoría en una sola transacción
+
+        return ToDto(pedido);
+    }
     private static PedidoDto ToDto(Pedido p) => new()
     {
         IdPedido = p.IdPedido,

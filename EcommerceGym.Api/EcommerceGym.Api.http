@@ -336,3 +336,73 @@ Authorization: Bearer {{login.response.body.$.token}}
 ### Solo ingresos
 GET {{host}}/api/auditoria?entidad=Ingreso
 Authorization: Bearer {{login.response.body.$.token}}
+
+### Reseñas de un producto (público)
+GET {{host}}/api/resenas-producto/producto/5
+
+### Crear reseña
+# @name resena
+POST {{host}}/api/resenas-producto/producto/5
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "calificacion": 5, "comentario": "Muy buena máquina, llegó en perfecto estado." }
+
+### Reseñar de nuevo el mismo producto (409)
+POST {{host}}/api/resenas-producto/producto/5
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "calificacion": 4, "comentario": "Otra vez." }
+
+### Calificación inválida (400)
+POST {{host}}/api/resenas-producto/producto/1
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "calificacion": 6, "comentario": "x" }
+
+### Editar mi reseña
+PUT {{host}}/api/resenas-producto/{{resena.response.body.$.idResena}}
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "calificacion": 4, "comentario": "Muy buena, aunque el armado es largo." }
+
+### Con token, el listado incluye "miResena"
+GET {{host}}/api/resenas-producto/producto/5
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+### Reseña general
+# @name general
+POST {{host}}/api/resenas-plataforma
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "calificacion": 5, "comentario": "Muy buenos productos y atención al cliente." }
+
+###
+GET {{host}}/api/resenas-plataforma
+
+### Mis reseñas
+GET {{host}}/api/mis-resenas
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+### El admin no puede reseñar (403)
+POST {{host}}/api/resenas-plataforma
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "calificacion": 5, "comentario": "x" }
+
+### Estadísticas: "mejorValorados" ahora trae datos
+GET {{host}}/api/estadisticas
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Eliminar
+DELETE {{host}}/api/resenas-producto/{{resena.response.body.$.idResena}}
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+###
+DELETE {{host}}/api/resenas-plataforma/{{general.response.body.$.idResena}}
+Authorization: Bearer {{loginCliente.response.body.$.token}}

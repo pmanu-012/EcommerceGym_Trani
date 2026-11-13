@@ -1192,3 +1192,258 @@ html, body {
     font-size: .7rem;
     font-weight: 700;
 }
+
+/* Ingresos */
+.formulario .agregar-linea {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: .6rem;
+}
+
+    .formulario .agregar-linea select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .formulario .agregar-linea input {
+        width: 84px;
+        text-align: center;
+    }
+
+.agregar-linea .btn-accent {
+    padding: .5rem .9rem;
+}
+
+.fila-linea {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: .4rem;
+    background: #fff;
+    border-radius: 10px;
+    padding: .5rem .75rem;
+}
+
+    .fila-linea .nombre {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .fila-linea .dato {
+        font-weight: 700;
+        color: #1a7f4b;
+    }
+
+    .fila-linea .icon-btn {
+        color: var(--rojo-oferta);
+    }
+
+.dato-ok {
+    font-weight: 700;
+    color: #1a7f4b;
+}
+
+/* Auditoría */
+.card-audit {
+    background: #fff;
+    border-radius: var(--radio);
+    padding: .75rem 1rem;
+    margin-bottom: .6rem;
+}
+
+    .card-audit .fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .card-audit .titulo {
+        font-weight: 600;
+    }
+
+    .card-audit .meta {
+        color: var(--gris-texto);
+        font-size: .8rem;
+    }
+
+.cambios {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin-top: .5rem;
+    padding-top: .5rem;
+    border-top: 1px solid #eee;
+    font-size: .85rem;
+}
+
+.cambio {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    align-items: baseline;
+}
+
+    .cambio .campo {
+        font-weight: 600;
+    }
+
+    .cambio .ant {
+        color: var(--rojo-oferta);
+        text-decoration: line-through;
+    }
+
+    .cambio .nue {
+        color: #1a7f4b;
+        font-weight: 600;
+    }
+
+.accion-crear {
+    background: #22A559;
+}
+
+.accion-modificar {
+    background: #F5B400;
+    color: #3b2f00;
+}
+
+.accion-eliminar {
+    background: var(--rojo-oferta);
+}
+
+/* Reseñas */
+.estrellas {
+    display: inline-flex;
+    gap: 1px;
+    line-height: 1;
+}
+
+.estrella {
+    font-size: var(--tam, 18px);
+    color: #d5d8dd;
+    background: none;
+    border: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+    .estrella.llena {
+        color: #F5B400;
+    }
+
+.estrellas.editable {
+    gap: .35rem;
+}
+
+.selector-estrellas {
+    display: flex;
+    justify-content: center;
+    margin: .25rem 0 .75rem;
+}
+
+.encabezado-resenas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .6rem;
+}
+
+    .encabezado-resenas h2 {
+        margin: 0;
+    }
+
+.promedio {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    color: var(--gris-texto);
+    font-size: .85rem;
+    white-space: nowrap;
+}
+
+.resena-card {
+    background: var(--hueso);
+    border-radius: 12px;
+    padding: .7rem .85rem;
+    margin-bottom: .55rem;
+}
+
+    .resena-card .fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .resena-card .titulo {
+        font-weight: 700;
+    }
+
+    .resena-card .comentario {
+        margin: .3rem 0;
+        font-style: italic;
+    }
+
+    .resena-card .meta {
+        color: var(--gris-texto);
+        font-size: .75rem;
+    }
+
+.acciones-resena {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .5rem;
+}
+
+.chip {
+    border: 0;
+    border-radius: 999px;
+    padding: .3rem .9rem;
+    font-size: .8rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.chip-editar {
+    background: #F5B400;
+    color: #3b2f00;
+}
+
+.chip-eliminar {
+    background: var(--rojo-oferta);
+}
+
+.btn-link {
+    background: none;
+    border: 0;
+    padding: .3rem 0;
+    color: var(--naranja);
+    font-weight: 600;
+}
+
+.boton-resena {
+    margin-top: .6rem;
+}
+
+.modal-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: .5rem;
+}
+
+    .modal-cabecera h2 {
+        margin: 0;
+    }
+
+.modal-resena textarea {
+    width: 100%;
+    margin-bottom: .75rem;
+    padding: .7rem .8rem;
+    font: inherit;
+    background: #fff;
+    border: 1px solid #d5d8dd;
+    border-radius: 10px;
+    resize: vertical;
+}

@@ -1,0 +1,126 @@
+﻿@page "/admin/ingresos/nuevo"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject ProductoService Productos
+@inject AdminService Admin
+@inject NavigationManager Nav
+
+<EncabezadoPagina Titulo="Registrar ingreso" />
+
+@if (productos is null && error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (productos is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else
+{
+    <div class="formulario">
+        <div class="campo">
+            <label>Observación (opcional)</label>
+            <input type="text" maxlength="500" placeholder="Ej: Reposición de proveedor" @bind="observacion" />
+        </div>
+
+        <h2 class="titulo-seccion">Productos del ingreso</h2>
+
+        <div class="agregar-linea">
+            <select @bind="idSeleccionado">
+                <option value="0">Seleccioná un producto</option>
+                @foreach (var p in productos)
+                {
+                    <option value="@p.IdProducto">@p.Nombre (stock: @p.Stock)</option>
+                }
+            </select>
+            <input type="number" min="1" @bind="cantidad" />
+            <button type="button" class="btn-accent" @onclick="Agregar">Agregar</button>
+        </div>
+
+        @if (errorLinea is not null)
+        {
+            <div class="mensaje-error">@errorLinea</div>
+        }
+
+        @if (lineas.Count == 0)
+        {
+            <p class="vacio-chico">Todavía no agregaste productos.</p>
+        }
+        else
+        {
+            @foreach (var l in lineas)
+            {
+                <div class="fila-linea">
+                    <span class="nombre">@NombreDe(l.IdProducto)</span>
+                    <span class="dato">+@l.Cantidad</span>
+                    <button type="button" class="icon-btn" @onclick="() => lineas.Remove(l)" aria-label="Quitar"><Icono Nombre="delete" /></button>
+                </div>
+            }
+        }
+
+        @if (error is not null)
+        {
+            <div class="mensaje-error">@error</div>
+        }
+
+        <div class="acciones-detalle">
+            <button type="button" class="btn-bloque btn-oscuro" @onclick="Guardar" disabled="@guardando">Registrar ingreso</button>
+            <a class="btn-bloque btn-secundario" href="admin/ingresos">Cancelar</a>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProductoDto>? productos;
+    private readonly List<NuevoIngresoItemDto> lineas = new();
+    private string? observacion;
+    private int idSeleccionado;
+    private int cantidad = 1;
+    private bool guardando;
+    private string? error;
+    private string? errorLinea;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { productos = await Productos.GetProductosAsync(); }
+        catch (Exception) { error = "No se pudieron cargar los productos. Verificá tu conexión e intentá de nuevo."; }
+    }
+
+    private string NombreDe(int idProducto) =>
+        productos?.FirstOrDefault(p => p.IdProducto == idProducto)?.Nombre ?? "Producto";
+
+    private void Agregar()
+    {
+        errorLinea = null;
+
+        if (idSeleccionado == 0) { errorLinea = "Seleccioná un producto."; return; }
+        if (cantidad < 1) { errorLinea = "La cantidad debe ser al menos 1."; return; }
+
+        // Si el producto ya está en la lista, se suma la cantidad
+        var existente = lineas.FirstOrDefault(l => l.IdProducto == idSeleccionado);
+        if (existente is not null)
+            existente.Cantidad += cantidad;
+        else
+            lineas.Add(new NuevoIngresoItemDto { IdProducto = idSeleccionado, Cantidad = cantidad });
+
+        idSeleccionado = 0;
+        cantidad = 1;
+    }
+
+    private async Task Guardar()
+    {
+        error = null;
+
+        if (lineas.Count == 0)
+        {
+            error = "Agregá al menos un producto al ingreso.";
+            return;
+        }
+
+        guardando = true;
+        error = await Admin.CrearIngresoAsync(new NuevoIngresoDto { Observacion = observacion, Items = lineas });
+        guardando = false;
+
+        if (error is null) Nav.NavigateTo("admin/ingresos?registrado=true");
+    }
+}

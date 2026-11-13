@@ -1,6 +1,7 @@
 ﻿using EcommerceGym.Shared.DTOs;
 using EcommerceGym.Shared.Enums;
 using System.Net.Http.Json;
+using static Android.Graphics.Paint;
 
 namespace EcommerceGym.App.Services;
 
@@ -86,8 +87,32 @@ public class AdminService
     public Task<string?> DarDeBajaAsync(int id) =>
         EjecutarAsync(() => _http.DeleteAsync($"api/usuarios/{id}"));
 
-// Devuelve null si salió bien, o el mensaje de error
-private static async Task<string?> EjecutarAsync(Func<Task<HttpResponseMessage>> peticion)
+    // ---------- Ingresos de mercadería ----------
+    public async Task<List<IngresoResumenDto>> IngresosAsync() =>
+        await _http.GetFromJsonAsync<List<IngresoResumenDto>>("api/ingresos") ?? new();
+
+    public async Task<IngresoDto?> GetIngresoAsync(int id)
+    {
+        var resp = await _http.GetAsync($"api/ingresos/{id}");
+        if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        resp.EnsureSuccessStatusCode();
+        return await resp.Content.ReadFromJsonAsync<IngresoDto>();
+    }
+
+    public Task<string?> CrearIngresoAsync(NuevoIngresoDto dto) =>
+        EjecutarAsync(() => _http.PostAsJsonAsync("api/ingresos", dto));
+
+    // ---------- Auditoría ----------
+    public async Task<List<AuditoriaDto>> AuditoriaAsync(string? entidad = null, AccionAuditoria? accion = null, int limite = 50)
+    {
+        var qs = new List<string> { $"limite={limite}" };
+        if (!string.IsNullOrWhiteSpace(entidad)) qs.Add($"entidad={Uri.EscapeDataString(entidad)}");
+        if (accion.HasValue) qs.Add($"accion={accion}");
+        return await _http.GetFromJsonAsync<List<AuditoriaDto>>("api/auditoria?" + string.Join("&", qs)) ?? new();
+    }
+
+    // Devuelve null si salió bien, o el mensaje de error
+    private static async Task<string?> EjecutarAsync(Func<Task<HttpResponseMessage>> peticion)
     {
         try
         {

@@ -1,0 +1,103 @@
+﻿@page "/admin/auditoria"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+
+<EncabezadoPagina Titulo="Auditoría" MostrarVolver="false" />
+
+<div class="barra-filtros">
+    <select class="select-filtro" @bind="entidad" @bind:after="Cargar">
+        <option value="">Todas las entidades</option>
+        @foreach (var e in entidades)
+        {
+            <option value="@e">@e</option>
+        }
+    </select>
+    <select class="select-filtro" @bind="accion" @bind:after="Cargar">
+        <option value="">Todas las acciones</option>
+        @foreach (var a in Enum.GetValues<AccionAuditoria>())
+        {
+            <option value="@a">@a</option>
+        }
+    </select>
+</div>
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (lista is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (lista.Count == 0)
+{
+    <p class="estado-vacio">No hay registros con esos filtros.</p>
+}
+else
+{
+    <p class="nota-chica">Se muestran los últimos @lista.Count registros. Tocá uno para ver los cambios.</p>
+
+    @foreach (var r in lista)
+    {
+        <div class="card-audit" @onclick="() => Alternar(r.IdAuditoria)">
+            <div class="fila">
+                <span class="titulo">@r.Entidad #@r.IdRegistro</span>
+                <span class="estado accion-@r.Accion.ToString().ToLower()">@r.Accion</span>
+            </div>
+            <span class="meta">@Formato.FechaHora(r.Fecha) · @r.Usuario</span>
+
+            @if (abiertos.Contains(r.IdAuditoria))
+            {
+                var cambios = AuditoriaFormato.Cambios(r.ValorAnterior, r.ValorNuevo);
+                <div class="cambios">
+                    @if (cambios.Count == 0)
+                    {
+                        <span class="meta">Sin detalle de cambios.</span>
+                    }
+                    @foreach (var c in cambios)
+                    {
+                        <div class="cambio">
+                            <span class="campo">@c.Campo:</span>
+                            @if (c.Anterior is not null)
+                            {
+                                <span class="ant">@c.Anterior</span>
+                                <span>→</span>
+                            }
+                            <span class="nue">@(c.Nuevo ?? "—")</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+}
+
+@code {
+    private static readonly string[] entidades = { "Pedido", "Producto", "Usuario", "Ingreso" };
+
+    private List<AuditoriaDto>? lista;
+    private readonly HashSet<int> abiertos = new();
+    private string entidad = string.Empty;
+    private string accion = string.Empty;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        error = null;
+        abiertos.Clear();
+        try
+        {
+            AccionAuditoria? filtro = Enum.TryParse<AccionAuditoria>(accion, out var a) ? a : null;
+            lista = await Admin.AuditoriaAsync(entidad, filtro);
+        }
+        catch (Exception) { error = "No se pudo cargar la auditoría. Verificá tu conexión e intentá de nuevo."; }
+    }
+
+    private void Alternar(int id)
+    {
+        if (!abiertos.Remove(id)) abiertos.Add(id);
+    }
+}

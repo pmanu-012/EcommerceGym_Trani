@@ -1,0 +1,26 @@
+﻿<!--Sirve para mostrar una calificación y también como selector-->
+
+<span class="estrellas @(Editable ? "editable" : null)" style="--tam:@(Tamano)px">
+    @for (var i = 1; i <= 5; i++)
+    {
+        var n = i;
+        if (Editable)
+        {
+            <button type="button" class="estrella @(n <= Valor ? "llena" : null)"
+                    @onclick="() => OnElegir.InvokeAsync(n)" aria-label="@n de 5 estrellas">★</button>
+        }
+        else
+        {
+            <span class="estrella @(n <= Redondeado ? "llena" : null)">★</span>
+        }
+    }
+</span>
+
+@code {
+    [Parameter] public double Valor { get; set; }
+    [Parameter] public int Tamano { get; set; } = 18;
+    [Parameter] public bool Editable { get; set; }
+    [Parameter] public EventCallback<int> OnElegir { get; set; }
+
+    private int Redondeado => (int)Math.Round(Valor, MidpointRounding.AwayFromZero);
+}

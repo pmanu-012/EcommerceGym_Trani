@@ -1,0 +1,172 @@
+﻿@inject ResenaService Resenas
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<!--Es la sección completa (promedio, lista, “Ver más”, botón y modal). 
+Se usa para las reseñas de un producto y para las generales del Home-->
+
+<section class="bloque">
+    <div class="encabezado-resenas">
+        <h2>@Titulo</h2>
+        @if (datos is { Cantidad: > 0 })
+        {
+            <span class="promedio">
+                <Estrellas Valor="datos.Promedio" Tamano="15" />
+                <span>@Formato.Promedio(datos.Promedio) (@datos.Cantidad)</span>
+            </span>
+        }
+    </div>
+
+    @if (errorCarga is not null)
+    {
+        <p class="vacio-chico">@errorCarga</p>
+    }
+    else if (datos is null)
+    {
+        <p class="vacio-chico">Cargando reseñas...</p>
+    }
+    else
+    {
+        @if (errorAccion is not null)
+        {
+            <div class="mensaje-error">@errorAccion</div>
+        }
+
+        @if (datos.Items.Count == 0)
+        {
+            <p class="vacio-chico">@TextoVacio</p>
+        }
+        else
+        {
+            @foreach (var r in Visibles)
+            {
+                <ResenaCard Titulo="@(EsMia(r) ? r.Usuario + " (vos)" : r.Usuario)"
+                            Calificacion="r.Calificacion"
+                            Comentario="@r.Comentario"
+                            Fecha="r.Fecha"
+                            MostrarAcciones="EsMia(r)"
+                            OnEditar="AbrirEditar"
+                            OnEliminar="() => confirmarEliminar = true" />
+            }
+
+            @if (datos.Items.Count > Limite && !verTodas)
+            {
+                <button type="button" class="btn-link" @onclick="() => verTodas = true">Ver más</button>
+            }
+        }
+
+        @if (!Auth.EsAdmin && datos.MiResena is null)
+        {
+            <button type="button" class="btn-bloque btn-secundario boton-resena" @onclick="AbrirNueva">@TextoBoton</button>
+        }
+    }
+</section>
+
+<ResenaModal Visible="modalAbierto"
+             Titulo="@(editando ? "Editar reseña" : "Dejar una reseña")"
+             TextoGuardar="@(editando ? "Guardar cambios" : "Publicar")"
+             Inicial="@(editando && datos?.MiResena is not null ? new ResenaFormDto { Calificacion = datos.MiResena.Calificacion, Comentario = datos.MiResena.Comentario } : null)"
+             Ocupado="ocupado"
+             Error="errorModal"
+             OnGuardar="Guardar"
+             OnCancelar="() => modalAbierto = false" />
+
+<ConfirmDialog Visible="confirmarEliminar"
+               Titulo="Eliminar reseña"
+               Mensaje="¿Querés eliminar tu reseña? Esta acción no se puede deshacer."
+               TextoConfirmar="Eliminar"
+               ClaseConfirmar="btn-peligro"
+               Ocupado="ocupado"
+               OnConfirmar="Eliminar"
+               OnCancelar="() => confirmarEliminar = false" />
+
+@code {
+    // Con IdProducto: reseñas de ese producto. Sin IdProducto: reseñas generales de la plataforma
+    [Parameter] public int? IdProducto { get; set; }
+    [Parameter] public string Titulo { get; set; } = "Reseñas";
+    [Parameter] public string TextoVacio { get; set; } = "Todavía no hay reseñas.";
+    [Parameter] public string TextoBoton { get; set; } = "Dejar una reseña";
+    [Parameter] public int Limite { get; set; } = 3;
+
+    private ResenasDto? datos;
+    private string? errorCarga;
+    private string? errorAccion;
+    private string? errorModal;
+    private bool verTodas;
+    private bool modalAbierto;
+    private bool editando;
+    private bool confirmarEliminar;
+    private bool ocupado;
+    private bool inicializado;
+    private int? idCargado;
+
+    private string Tipo => IdProducto.HasValue ? "Producto" : "Plataforma";
+
+    private IEnumerable<ResenaDto> Visibles => verTodas ? datos!.Items : datos!.Items.Take(Limite);
+
+    private bool EsMia(ResenaDto r) => Auth.Sesion is not null && r.IdUsuario == Auth.Sesion.IdUsuario;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (inicializado && idCargado == IdProducto) return;
+
+        inicializado = true;
+        idCargado = IdProducto;
+        datos = null;
+        verTodas = false;
+        await Cargar();
+    }
+
+    private async Task Cargar()
+    {
+        errorCarga = null;
+        try { datos = await Resenas.ObtenerAsync(IdProducto, Limite); }
+        catch (Exception) { errorCarga = "No se pudieron cargar las reseñas."; }
+    }
+
+    private void AbrirNueva()
+    {
+        // Para reseñar hay que haber iniciado sesión
+        if (!Auth.EstaAutenticado) { Nav.NavigateTo("login"); return; }
+
+        editando = false;
+        errorModal = null;
+        modalAbierto = true;
+    }
+
+    private void AbrirEditar()
+    {
+        editando = true;
+        errorModal = null;
+        modalAbierto = true;
+    }
+
+    private async Task Guardar(ResenaFormDto dto)
+    {
+        ocupado = true; errorModal = null;
+
+        errorModal = editando && datos?.MiResena is not null
+            ? await Resenas.EditarAsync(Tipo, datos.MiResena.IdResena, dto)
+            : await Resenas.CrearAsync(IdProducto, dto);
+
+        ocupado = false;
+
+        if (errorModal is null)
+        {
+            modalAbierto = false;
+            await Cargar();
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        if (datos?.MiResena is null) return;
+
+        ocupado = true; errorAccion = null;
+        errorAccion = await Resenas.EliminarAsync(Tipo, datos.MiResena.IdResena);
+        ocupado = false;
+        confirmarEliminar = false;
+
+        if (errorAccion is null) await Cargar();
+    }
+}

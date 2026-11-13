@@ -33,6 +33,7 @@ namespace EcommerceGym.App
             builder.Services.AddSingleton<CarritoService>();
             builder.Services.AddScoped<PedidoService>();
             builder.Services.AddScoped<AdminService>();
+            builder.Services.AddScoped<ResenaService>();
             return builder.Build();
         }
     }

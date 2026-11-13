@@ -1,0 +1,76 @@
+﻿<!--(estrellas, comentario, Cancelar y Publicar). Sirve para crear y para editar-->
+
+@if (Visible)
+{
+    <div class="hoja-fondo" @onclick="OnCancelar"></div>
+    <div class="modal-caja modal-resena" role="dialog">
+        <div class="modal-cabecera">
+            <h2>@Titulo</h2>
+            <button type="button" class="icon-btn" @onclick="OnCancelar" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="selector-estrellas">
+            <Estrellas Valor="modelo.Calificacion" Editable="true" Tamano="38" OnElegir="Elegir" />
+        </div>
+
+        <textarea rows="4" maxlength="1000" placeholder="Escribí tu comentario..."
+                  @bind="modelo.Comentario" @bind:event="oninput"></textarea>
+
+        @if (MensajeError is not null)
+        {
+            <div class="mensaje-error">@MensajeError</div>
+        }
+
+        <div class="modal-acciones">
+            <button type="button" class="btn-bloque btn-secundario" @onclick="OnCancelar" disabled="@Ocupado">Cancelar</button>
+            <button type="button" class="btn-bloque btn-accent" @onclick="Guardar" disabled="@Ocupado">@TextoGuardar</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Titulo { get; set; } = "Dejar una reseña";
+    [Parameter] public string TextoGuardar { get; set; } = "Publicar";
+    [Parameter] public ResenaFormDto? Inicial { get; set; }
+    [Parameter] public bool Ocupado { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public EventCallback<ResenaFormDto> OnGuardar { get; set; }
+    [Parameter] public EventCallback OnCancelar { get; set; }
+
+    private ResenaFormDto modelo = new();
+    private string? errorLocal;
+    private bool estabaVisible;
+
+    private string? MensajeError => errorLocal ?? Error;
+
+    protected override void OnParametersSet()
+    {
+        // Al abrirse, el formulario arranca vacío o con la reseña que se está editando
+        if (Visible && !estabaVisible)
+        {
+            modelo = new ResenaFormDto
+            {
+                Calificacion = Inicial?.Calificacion ?? 0,
+                Comentario = Inicial?.Comentario ?? string.Empty
+            };
+            errorLocal = null;
+        }
+        estabaVisible = Visible;
+    }
+
+    private void Elegir(int estrellas)
+    {
+        modelo.Calificacion = estrellas;
+        errorLocal = null;
+    }
+
+    private async Task Guardar()
+    {
+        if (modelo.Calificacion < 1) { errorLocal = "Elegí una calificación de 1 a 5 estrellas."; return; }
+        if (string.IsNullOrWhiteSpace(modelo.Comentario)) { errorLocal = "Escribí un comentario."; return; }
+
+        errorLocal = null;
+        await OnGuardar.InvokeAsync(modelo);
+    }
+}

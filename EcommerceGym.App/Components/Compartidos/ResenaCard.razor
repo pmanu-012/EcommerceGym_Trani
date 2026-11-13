@@ -1,0 +1,26 @@
+﻿<div class="resena-card">
+    <div class="fila">
+        <span class="titulo">@Titulo</span>
+        <Estrellas Valor="Calificacion" Tamano="16" />
+    </div>
+    <p class="comentario">“@Comentario”</p>
+    <span class="meta">@Formato.Fecha(Fecha)</span>
+
+    @if (MostrarAcciones)
+    {
+        <div class="acciones-resena">
+            <button type="button" class="chip chip-editar" @onclick="OnEditar">Editar</button>
+            <button type="button" class="chip chip-eliminar" @onclick="OnEliminar">Eliminar</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Titulo { get; set; } = string.Empty;
+    [Parameter] public int Calificacion { get; set; }
+    [Parameter] public string Comentario { get; set; } = string.Empty;
+    [Parameter] public DateTime Fecha { get; set; }
+    [Parameter] public bool MostrarAcciones { get; set; }
+    [Parameter] public EventCallback OnEditar { get; set; }
+    [Parameter] public EventCallback OnEliminar { get; set; }
+}

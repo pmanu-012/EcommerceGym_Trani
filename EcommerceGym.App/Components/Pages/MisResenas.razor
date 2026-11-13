@@ -1,0 +1,115 @@
+﻿@page "/mis-resenas"
+@attribute [Authorize(Roles = "Cliente")]
+@inject ResenaService Resenas
+
+<EncabezadoPagina Titulo="Mis reseñas" />
+
+@if (mensajeOk is not null)
+{
+    <div class="mensaje-ok">@mensajeOk</div>
+}
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+
+@if (lista is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (lista.Count == 0)
+{
+    <p class="estado-vacio">Todavía no dejaste ninguna reseña.</p>
+}
+else
+{
+    @foreach (var r in lista)
+    {
+        <ResenaCard Titulo="@r.Titulo"
+                    Calificacion="r.Calificacion"
+                    Comentario="@r.Comentario"
+                    Fecha="r.Fecha"
+                    MostrarAcciones="true"
+                    OnEditar="() => Abrir(r)"
+                    OnEliminar="() => aEliminar = r" />
+    }
+}
+
+<ResenaModal Visible="aEditar is not null"
+             Titulo="Editar reseña"
+             TextoGuardar="Guardar cambios"
+             Inicial="@(aEditar is null ? null : new ResenaFormDto { Calificacion = aEditar.Calificacion, Comentario = aEditar.Comentario })"
+             Ocupado="ocupado"
+             Error="errorModal"
+             OnGuardar="Guardar"
+             OnCancelar="() => aEditar = null" />
+
+<ConfirmDialog Visible="aEliminar is not null"
+               Titulo="Eliminar reseña"
+               Mensaje="@($"¿Querés eliminar tu reseña de \"{aEliminar?.Titulo}\"? Esta acción no se puede deshacer.")"
+               TextoConfirmar="Eliminar"
+               ClaseConfirmar="btn-peligro"
+               Ocupado="ocupado"
+               OnConfirmar="Eliminar"
+               OnCancelar="() => aEliminar = null" />
+
+@code {
+    private List<MiResenaDto>? lista;
+    private MiResenaDto? aEditar;
+    private MiResenaDto? aEliminar;
+    private bool ocupado;
+    private string? error;
+    private string? errorModal;
+    private string? mensajeOk;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        error = null;
+        try { lista = await Resenas.MisResenasAsync(); }
+        catch (Exception) { error = "No se pudieron cargar tus reseñas. Verificá tu conexión e intentá de nuevo."; }
+    }
+
+    private void Abrir(MiResenaDto r)
+    {
+        errorModal = null;
+        aEditar = r;
+    }
+
+    private async Task Guardar(ResenaFormDto dto)
+    {
+        if (aEditar is null) return;
+
+        ocupado = true; errorModal = null; mensajeOk = null;
+        errorModal = await Resenas.EditarAsync(aEditar.Tipo, aEditar.IdResena, dto);
+        ocupado = false;
+
+        if (errorModal is null)
+        {
+            aEditar = null;
+            mensajeOk = "Reseña actualizada.";
+            await Cargar();
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        if (aEliminar is null) return;
+
+        ocupado = true; error = null; mensajeOk = null;
+        var mensaje = await Resenas.EliminarAsync(aEliminar.Tipo, aEliminar.IdResena);
+        ocupado = false;
+        aEliminar = null;
+
+        if (mensaje is null)
+        {
+            mensajeOk = "Reseña eliminada.";
+            await Cargar();
+        }
+        else
+        {
+            error = mensaje;
+        }
+    }
+}

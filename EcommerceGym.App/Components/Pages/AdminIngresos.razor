@@ -1,0 +1,56 @@
+﻿@page "/admin/ingresos"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+
+<EncabezadoPagina Titulo="Ingresos de mercadería" MostrarVolver="false" />
+
+<a class="btn-accent btn-bloque separado" href="admin/ingresos/nuevo">+ Registrar ingreso</a>
+
+@if (Registrado)
+{
+    <div class="mensaje-ok">Ingreso registrado: el stock ya fue actualizado.</div>
+}
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (lista is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (lista.Count == 0)
+{
+    <p class="estado-vacio">Todavía no se registró ningún ingreso.</p>
+}
+else
+{
+    @foreach (var i in lista)
+    {
+        <a class="card-pedido" href="admin/ingresos/@i.IdIngreso">
+            <div class="fila">
+                <span class="numero">Ingreso @Formato.NumeroPedido(i.IdIngreso)</span>
+                <span class="estado estado-entregado">+@i.Unidades u.</span>
+            </div>
+            <span class="fecha">@Formato.FechaHora(i.Fecha) · @i.Usuario</span>
+            <div class="fila">
+                <span class="total">@(i.Productos == 1 ? "1 producto" : $"{i.Productos} productos")</span>
+                <span class="ver-detalle">Ver detalle ›</span>
+            </div>
+        </a>
+    }
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "registrado")] public bool Registrado { get; set; }
+
+    private List<IngresoResumenDto>? lista;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { lista = await Admin.IngresosAsync(); }
+        catch (Exception) { error = "No se pudieron cargar los ingresos. Verificá tu conexión e intentá de nuevo."; }
+    }
+}

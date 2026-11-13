@@ -1,0 +1,67 @@
+﻿@page "/admin/ingresos/{Id:int}"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+
+<EncabezadoPagina Titulo="Detalle de ingreso" />
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (!cargado)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (ingreso is null)
+{
+    <p class="estado-vacio">El ingreso no existe.</p>
+}
+else
+{
+    <section class="bloque">
+        <h2>Información del ingreso</h2>
+        <dl class="atributos">
+            <dt>Número</dt><dd>@Formato.NumeroPedido(ingreso.IdIngreso)</dd>
+            <dt>Fecha</dt><dd>@Formato.FechaHora(ingreso.Fecha)</dd>
+            <dt>Registrado por</dt><dd>@ingreso.Usuario</dd>
+            @if (!string.IsNullOrWhiteSpace(ingreso.Observacion))
+            {
+                <dt>Observación</dt><dd>@ingreso.Observacion</dd>
+            }
+        </dl>
+    </section>
+
+    <section class="bloque">
+        <h2>Productos</h2>
+        @foreach (var i in ingreso.Items)
+        {
+            <div class="item-pedido">
+                <div class="linea">
+                    <span class="nombre">@i.Nombre</span>
+                    <span class="dato-ok">+@i.Cantidad</span>
+                </div>
+            </div>
+        }
+    </section>
+
+    <div class="resumen">
+        <div class="linea total"><span>Total de unidades</span><span>+@ingreso.TotalUnidades</span></div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private IngresoDto? ingreso;
+    private bool cargado;
+    private string? error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        cargado = false; error = null; ingreso = null;
+        try { ingreso = await Admin.GetIngresoAsync(Id); }
+        catch (Exception) { error = "No se pudo cargar el ingreso. Verificá tu conexión e intentá de nuevo."; }
+        cargado = true;
+    }
+}

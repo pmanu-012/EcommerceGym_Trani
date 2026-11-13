@@ -1,0 +1,63 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<div class="app-shell">
+    <header class="topbar">
+        <button class="icon-btn" @onclick="() => abierto = true" aria-label="Abrir menú"><Icono Nombre="menu" /></button>
+        <span class="marca">Panel <span>admin</span></span>
+        <span class="espaciador"></span>
+    </header>
+
+    <main class="contenido sin-nav">@Body</main>
+</div>
+
+@if (abierto)
+{
+    <div class="hoja-fondo" @onclick="Cerrar"></div>
+    <aside class="drawer">
+        <div class="drawer-cabecera">
+            <div class="avatar-chico"><Icono Nombre="person" Tamano="30" /></div>
+            <strong>@Auth.Sesion?.Nombre @Auth.Sesion?.Apellido</strong>
+            <span>@Auth.Sesion?.Email</span>
+        </div>
+
+        <nav class="drawer-menu">
+            <NavLink class="item-drawer" ActiveClass="activo" href="admin/productos">
+                <Icono Nombre="inventario" /><span>Productos</span>
+            </NavLink>
+            <NavLink class="item-drawer" ActiveClass="activo" href="admin/pedidos">
+                <Icono Nombre="pedidos" /><span>Pedidos</span>
+            </NavLink>
+        </nav>
+
+        <div class="drawer-pie">
+            <a class="item-drawer" href="/"><Icono Nombre="home" /><span>Ver la tienda</span></a>
+            <button class="item-drawer" @onclick="Salir"><Icono Nombre="logout" /><span>Cerrar sesión</span></button>
+        </div>
+    </aside>
+}
+
+@code {
+    private bool abierto;
+
+    protected override void OnInitialized() => Nav.LocationChanged += AlNavegar;
+
+    // Al cambiar de pantalla, el menú se cierra solo
+    private void AlNavegar(object? sender, LocationChangedEventArgs e)
+    {
+        abierto = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Cerrar() => abierto = false;
+
+    private async Task Salir()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/");
+    }
+
+    public void Dispose() => Nav.LocationChanged -= AlNavegar;
+}

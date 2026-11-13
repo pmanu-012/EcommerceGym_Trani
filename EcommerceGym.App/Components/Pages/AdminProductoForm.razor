@@ -1,0 +1,187 @@
+﻿@page "/admin/productos/nuevo"
+@page "/admin/productos/{Id:int}"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+@inject CategoriaService Categorias
+@inject NavigationManager Nav
+
+<EncabezadoPagina Titulo="@(Id.HasValue ? "Editar producto" : "Nuevo producto")" />
+
+@if (modelo is null && error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (modelo is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else
+{
+    <EditForm Model="modelo" OnValidSubmit="Guardar" class="formulario">
+        <DataAnnotationsValidator />
+
+        <div class="campo">
+            <label>Nombre</label>
+            <InputText @bind-Value="modelo.Nombre" />
+            <ValidationMessage For="() => modelo.Nombre" />
+        </div>
+
+        <div class="campo">
+            <label>Precio</label>
+            <InputNumber @bind-Value="modelo.Precio" ParsingErrorMessage="Ingresá un número válido." />
+            <ValidationMessage For="() => modelo.Precio" />
+        </div>
+
+        <div class="campo">
+            <label>Precio de oferta (opcional)</label>
+            <InputNumber @bind-Value="modelo.PrecioOferta" ParsingErrorMessage="Ingresá un número válido." />
+            <ValidationMessage For="() => modelo.PrecioOferta" />
+        </div>
+
+        <div class="campo">
+            <label>Stock</label>
+            <InputNumber @bind-Value="modelo.Stock" ParsingErrorMessage="Ingresá un número entero." />
+            <ValidationMessage For="() => modelo.Stock" />
+        </div>
+
+        <div class="campo">
+            <label>Subcategoría</label>
+            <InputSelect @bind-Value="modelo.IdSubcategoria">
+                <option value="0">Seleccioná una subcategoría</option>
+                @foreach (var c in categorias)
+                {
+                    <optgroup label="@c.Nombre">
+                        @foreach (var s in c.Subcategorias)
+                        {
+                            <option value="@s.IdSubcategoria">@s.Nombre</option>
+                        }
+                    </optgroup>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => modelo.IdSubcategoria" />
+        </div>
+
+        <div class="campo">
+            <label>Uso (opcional)</label>
+            <InputSelect @bind-Value="modelo.Uso">
+                <option value="">Sin especificar</option>
+                @foreach (var u in Enum.GetValues<UsoProducto>())
+                {
+                    <option value="@u">@Formato.Legible(u.ToString())</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="campo">
+            <label>Material (opcional)</label>
+            <InputSelect @bind-Value="modelo.Material">
+                <option value="">Sin especificar</option>
+                @foreach (var m in Enum.GetValues<MaterialProducto>())
+                {
+                    <option value="@m">@Formato.Legible(m.ToString())</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="campo">
+            <label>Grupos musculares (opcional)</label>
+            <div class="checks">
+                @foreach (var g in grupos)
+                {
+                    <label class="check">
+                        <input type="checkbox" checked="@modelo.IdGruposMusculares.Contains(g.Id)"
+                               @onchange="e => Alternar(modelo.IdGruposMusculares, g.Id, e)" />
+                        <span>@g.Nombre</span>
+                    </label>
+                }
+            </div>
+        </div>
+
+        <div class="campo">
+            <label>Disciplinas (opcional)</label>
+            <div class="checks">
+                @foreach (var d in disciplinas)
+                {
+                    <label class="check">
+                        <input type="checkbox" checked="@modelo.IdDisciplinas.Contains(d.Id)"
+                               @onchange="e => Alternar(modelo.IdDisciplinas, d.Id, e)" />
+                        <span>@d.Nombre</span>
+                    </label>
+                }
+            </div>
+        </div>
+
+        <div class="campo">
+            <label>URL de la imagen (opcional)</label>
+            <InputText @bind-Value="modelo.ImagenUrl" inputmode="url" />
+            <ValidationMessage For="() => modelo.ImagenUrl" />
+        </div>
+
+        @if (error is not null)
+        {
+            <div class="mensaje-error">@error</div>
+        }
+
+        <div class="acciones-detalle">
+            <button type="submit" class="btn-bloque btn-oscuro" disabled="@guardando">
+                @(Id.HasValue ? "Guardar cambios" : "Crear producto")
+            </button>
+            <a class="btn-bloque btn-secundario" href="admin/productos">Cancelar</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int? Id { get; set; }
+
+    private ProductoFormDto? modelo;
+    private List<CategoriaDto> categorias = new();
+    private List<OpcionDto> disciplinas = new();
+    private List<OpcionDto> grupos = new();
+    private bool guardando;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            categorias = await Categorias.GetCategoriasAsync();
+            disciplinas = await Admin.DisciplinasAsync();
+            grupos = await Admin.GruposMuscularesAsync();
+
+            if (Id.HasValue)
+            {
+                modelo = await Admin.GetProductoFormAsync(Id.Value);
+                if (modelo is null) error = "El producto no existe.";
+            }
+            else
+            {
+                modelo = new ProductoFormDto();
+            }
+        }
+        catch (Exception)
+        {
+            error = "No se pudieron cargar los datos. Verificá tu conexión e intentá de nuevo.";
+        }
+    }
+
+    private static void Alternar(List<int> lista, int id, ChangeEventArgs e)
+    {
+        var marcado = (bool)(e.Value ?? false);
+        if (marcado && !lista.Contains(id)) lista.Add(id);
+        else if (!marcado) lista.Remove(id);
+    }
+
+    private async Task Guardar()
+    {
+        guardando = true; error = null;
+
+        error = Id.HasValue
+            ? await Admin.ActualizarProductoAsync(Id.Value, modelo!)
+            : await Admin.CrearProductoAsync(modelo!);
+
+        guardando = false;
+        if (error is null) Nav.NavigateTo("admin/productos");
+    }
+}

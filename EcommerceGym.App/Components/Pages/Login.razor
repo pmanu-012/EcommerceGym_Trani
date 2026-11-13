@@ -106,7 +106,7 @@
         cargando = true;
         error = await Auth.LoginAsync(loginModel);
         cargando = false;
-        if (error is null) Nav.NavigateTo("/");
+        if (error is null) Nav.NavigateTo(Auth.EsAdmin ? "admin" : "/");
     }
 
     private async Task EnviarRegistro()

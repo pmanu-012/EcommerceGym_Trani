@@ -1,0 +1,43 @@
+﻿<section class="bloque">
+    <h2>Información del pedido</h2>
+    <dl class="atributos">
+        <dt>Número</dt><dd>@Formato.NumeroPedido(Pedido.IdPedido)</dd>
+        <dt>Fecha</dt><dd>@Formato.Fecha(Pedido.Fecha)</dd>
+        <dt>Estado</dt><dd><EstadoBadge Estado="Pedido.Estado" /></dd>
+    </dl>
+</section>
+
+<section class="bloque">
+    <h2>Dirección de envío</h2>
+    <dl class="atributos">
+        <dt>Calle</dt><dd>@Pedido.Calle</dd>
+        <dt>Número</dt><dd>@Pedido.Numero</dd>
+        <dt>Ciudad</dt><dd>@Pedido.Ciudad</dd>
+        <dt>Provincia</dt><dd>@Pedido.Provincia</dd>
+        <dt>Código postal</dt><dd>@Pedido.CodigoPostal</dd>
+    </dl>
+</section>
+
+<section class="bloque">
+    <h2>Productos</h2>
+    @foreach (var i in Pedido.Items)
+    {
+        <div class="item-pedido">
+            <span class="nombre">@i.Nombre</span>
+            <div class="linea">
+                <span>@i.Cantidad × @Formato.Precio(i.PrecioUnitario)</span>
+                <span>@Formato.Precio(i.Subtotal)</span>
+            </div>
+        </div>
+    }
+</section>
+
+<div class="resumen">
+    <div class="linea"><span>Subtotal</span><span>@Formato.Precio(Pedido.Subtotal)</span></div>
+    <div class="linea"><span>Costo de envío</span><span>@Formato.Precio(Pedido.CostoEnvio)</span></div>
+    <div class="linea total"><span>Total</span><span>@Formato.Precio(Pedido.Total)</span></div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public PedidoDto Pedido { get; set; } = null!;
+}

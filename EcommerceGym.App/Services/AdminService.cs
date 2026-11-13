@@ -1,0 +1,76 @@
+﻿using System.Net.Http.Json;
+using EcommerceGym.Shared.DTOs;
+using EcommerceGym.Shared.Enums;
+
+namespace EcommerceGym.App.Services;
+
+public class AdminService
+{
+    private const string SinConexion = "No se pudo conectar con el servidor. Verificá tu conexión.";
+
+    private readonly HttpClient _http;
+    private List<OpcionDto>? _disciplinas;
+    private List<OpcionDto>? _grupos;
+
+    public AdminService(HttpClient http) => _http = http;
+
+    // ---------- Pedidos ----------
+    public async Task<List<PedidoAdminDto>> PedidosAsync(string? buscar = null)
+    {
+        var url = "api/pedidos" +
+                  (string.IsNullOrWhiteSpace(buscar) ? "" : $"?buscar={Uri.EscapeDataString(buscar)}");
+        return await _http.GetFromJsonAsync<List<PedidoAdminDto>>(url) ?? new();
+    }
+
+    public async Task<(PedidoDto? Pedido, string? Error)> CambiarEstadoAsync(int id, EstadoPedido estado)
+    {
+        try
+        {
+            var resp = await _http.PutAsJsonAsync($"api/pedidos/{id}/estado", new CambiarEstadoDto { Estado = estado });
+            if (!resp.IsSuccessStatusCode) return (null, await ApiErrores.LeerAsync(resp));
+            return (await resp.Content.ReadFromJsonAsync<PedidoDto>(), null);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            return (null, SinConexion);
+        }
+    }
+
+    // ---------- Productos ----------
+    public async Task<ProductoFormDto?> GetProductoFormAsync(int id)
+    {
+        var resp = await _http.GetAsync($"api/productos/{id}/edicion");
+        if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        resp.EnsureSuccessStatusCode();
+        return await resp.Content.ReadFromJsonAsync<ProductoFormDto>();
+    }
+
+    public Task<string?> CrearProductoAsync(ProductoFormDto dto) =>
+        EjecutarAsync(() => _http.PostAsJsonAsync("api/productos", dto));
+
+    public Task<string?> ActualizarProductoAsync(int id, ProductoFormDto dto) =>
+        EjecutarAsync(() => _http.PutAsJsonAsync($"api/productos/{id}", dto));
+
+    public Task<string?> EliminarProductoAsync(int id) =>
+        EjecutarAsync(() => _http.DeleteAsync($"api/productos/{id}"));
+
+    public async Task<List<OpcionDto>> DisciplinasAsync() =>
+        _disciplinas ??= await _http.GetFromJsonAsync<List<OpcionDto>>("api/catalogos/disciplinas") ?? new();
+
+    public async Task<List<OpcionDto>> GruposMuscularesAsync() =>
+        _grupos ??= await _http.GetFromJsonAsync<List<OpcionDto>>("api/catalogos/grupos-musculares") ?? new();
+
+    // Devuelve null si salió bien, o el mensaje de error
+    private static async Task<string?> EjecutarAsync(Func<Task<HttpResponseMessage>> peticion)
+    {
+        try
+        {
+            var resp = await peticion();
+            return resp.IsSuccessStatusCode ? null : await ApiErrores.LeerAsync(resp);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            return SinConexion;
+        }
+    }
+}

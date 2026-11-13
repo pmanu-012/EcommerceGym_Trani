@@ -19,6 +19,15 @@
     </a>
 }
 
+@if (Auth.EsAdmin)
+{
+    <a class="fila-menu" href="admin">
+        <Icono Nombre="stats" />
+        <span>Panel de administración</span>
+        <Icono Nombre="chevron" />
+    </a>
+}
+
 <button class="btn-bloque btn-peligro" @onclick="Salir">Cerrar sesión</button>
 
 @code {

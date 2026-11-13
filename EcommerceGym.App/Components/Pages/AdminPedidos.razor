@@ -1,0 +1,56 @@
+﻿@page "/admin/pedidos"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject AdminService Admin
+
+<EncabezadoPagina Titulo="Pedidos" MostrarVolver="false" />
+
+<form class="buscador" @onsubmit="Cargar">
+    <input type="search" placeholder="Buscar por número o cliente..." @bind="texto" />
+    <button class="btn-accent" type="submit">Buscar</button>
+</form>
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (lista is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (lista.Count == 0)
+{
+    <p class="estado-vacio">No se encontraron pedidos.</p>
+}
+else
+{
+    @foreach (var p in lista)
+    {
+        <a class="card-pedido" href="admin/pedido/@p.IdPedido">
+            <div class="fila">
+                <span class="numero">@Formato.NumeroPedido(p.IdPedido)</span>
+                <EstadoBadge Estado="p.Estado" />
+            </div>
+            <span class="cliente">@p.Cliente</span>
+            <div class="fila">
+                <span class="fecha">@Formato.Fecha(p.Fecha) · @Formato.Precio(p.Total)</span>
+                <span class="ver-detalle">Ver detalle ›</span>
+            </div>
+        </a>
+    }
+}
+
+@code {
+    private List<PedidoAdminDto>? lista;
+    private string texto = string.Empty;
+    private string? error;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private async Task Cargar()
+    {
+        error = null;
+        try { lista = await Admin.PedidosAsync(texto); }
+        catch (Exception) { error = "No se pudieron cargar los pedidos. Verificá tu conexión e intentá de nuevo."; }
+    }
+}

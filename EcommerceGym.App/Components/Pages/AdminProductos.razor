@@ -1,0 +1,110 @@
+﻿@page "/admin/productos"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject ProductoService Productos
+@inject AdminService Admin
+
+<EncabezadoPagina Titulo="Productos" MostrarVolver="false" />
+
+<a class="btn-accent btn-bloque separado" href="admin/productos/nuevo">+ Nuevo producto</a>
+
+<form class="buscador" @onsubmit="Cargar">
+    <input type="search" placeholder="Buscar producto..." @bind="texto" />
+    <button class="btn-accent" type="submit">Buscar</button>
+</form>
+
+@if (mensajeOk is not null)
+{
+    <div class="mensaje-ok">@mensajeOk</div>
+}
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+
+@if (lista is null)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (lista.Count == 0)
+{
+    <p class="estado-vacio">No se encontraron productos.</p>
+}
+else
+{
+    @foreach (var p in lista)
+    {
+        <div class="fila-admin">
+            <div class="mini">
+                @if (!string.IsNullOrWhiteSpace(p.ImagenUrl))
+                {
+                    <img src="@p.ImagenUrl" alt="@p.Nombre" />
+                }
+                else
+                {
+                    <span>Sin imagen</span>
+                }
+            </div>
+            <div class="datos">
+                <span class="nombre">@p.Nombre</span>
+                <span class="sub">@Ruta(p)</span>
+                <span class="sub">@Formato.Precio(p.PrecioFinal) · Stock: @p.Stock</span>
+            </div>
+            <div class="acciones-fila">
+                <a class="icon-btn" href="admin/productos/@p.IdProducto" aria-label="Editar"><Icono Nombre="edit" /></a>
+                <button class="icon-btn peligro" @onclick="() => aEliminar = p" aria-label="Eliminar"><Icono Nombre="delete" /></button>
+            </div>
+        </div>
+    }
+}
+
+<ConfirmDialog Visible="aEliminar is not null"
+               Titulo="Eliminar producto"
+               Mensaje="@($"¿Querés eliminar \"{aEliminar?.Nombre}\"? Dejará de mostrarse en la tienda, pero se conserva el historial de pedidos.")"
+               TextoConfirmar="Eliminar"
+               ClaseConfirmar="btn-peligro"
+               Ocupado="ocupado"
+               OnConfirmar="Eliminar"
+               OnCancelar="() => aEliminar = null" />
+
+@code {
+    private List<ProductoDto>? lista;
+    private ProductoDto? aEliminar;
+    private string texto = string.Empty;
+    private string? error;
+    private string? mensajeOk;
+    private bool ocupado;
+
+    protected override async Task OnInitializedAsync() => await Cargar();
+
+    private static string Ruta(ProductoDto p) =>
+        p.Subcategoria == "General" ? p.Categoria : $"{p.Categoria} › {p.Subcategoria}";
+
+    private async Task Cargar()
+    {
+        error = null;
+        try { lista = await Productos.GetProductosAsync(buscar: texto); }
+        catch (Exception) { error = "No se pudieron cargar los productos. Verificá tu conexión e intentá de nuevo."; }
+    }
+
+    private async Task Eliminar()
+    {
+        if (aEliminar is null) return;
+
+        ocupado = true; error = null; mensajeOk = null;
+        var mensaje = await Admin.EliminarProductoAsync(aEliminar.IdProducto);
+        ocupado = false;
+
+        if (mensaje is null)
+        {
+            mensajeOk = $"Se eliminó \"{aEliminar.Nombre}\".";
+            aEliminar = null;
+            await Cargar();
+        }
+        else
+        {
+            error = mensaje;
+            aEliminar = null;
+        }
+    }
+}

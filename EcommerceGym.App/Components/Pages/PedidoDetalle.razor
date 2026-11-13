@@ -18,53 +18,7 @@ else if (pedido is null)
 }
 else
 {
-    <section class="bloque">
-        <h2>Información del pedido</h2>
-        <dl class="atributos">
-            <dt>Número</dt>
-            <dd>@Formato.NumeroPedido(pedido.IdPedido)</dd>
-            <dt>Fecha</dt>
-            <dd>@Formato.Fecha(pedido.Fecha)</dd>
-            <dt>Estado</dt>
-            <dd><EstadoBadge Estado="pedido.Estado" /></dd>
-        </dl>
-    </section>
-
-    <section class="bloque">
-        <h2>Dirección de envío</h2>
-        <dl class="atributos">
-            <dt>Calle</dt>
-            <dd>@pedido.Calle</dd>
-            <dt>Número</dt>
-            <dd>@pedido.Numero</dd>
-            <dt>Ciudad</dt>
-            <dd>@pedido.Ciudad</dd>
-            <dt>Provincia</dt>
-            <dd>@pedido.Provincia</dd>
-            <dt>Código postal</dt>
-            <dd>@pedido.CodigoPostal</dd>
-        </dl>
-    </section>
-
-    <section class="bloque">
-        <h2>Productos</h2>
-        @foreach (var i in pedido.Items)
-        {
-            <div class="item-pedido">
-                <span class="nombre">@i.Nombre</span>
-                <div class="linea">
-                    <span>@i.Cantidad × @Formato.Precio(i.PrecioUnitario)</span>
-                    <span>@Formato.Precio(i.Subtotal)</span>
-                </div>
-            </div>
-        }
-    </section>
-
-    <div class="resumen">
-        <div class="linea"><span>Subtotal</span><span>@Formato.Precio(pedido.Subtotal)</span></div>
-        <div class="linea"><span>Costo de envío</span><span>@Formato.Precio(pedido.CostoEnvio)</span></div>
-        <div class="linea total"><span>Total</span><span>@Formato.Precio(pedido.Total)</span></div>
-    </div>
+    <PedidoDetalleVista Pedido="pedido" />
 }
 
 @code {

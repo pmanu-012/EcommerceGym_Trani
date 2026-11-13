@@ -1,0 +1,25 @@
+﻿<!--Un cuadro de confirmación propio, porque los confirm() del navegador no son confiables dentro de una app nativa-->
+
+@if (Visible)
+{
+    <div class="hoja-fondo" @onclick="OnCancelar"></div>
+    <div class="modal-caja" role="dialog">
+        <h2>@Titulo</h2>
+        <p>@Mensaje</p>
+        <div class="modal-acciones">
+            <button class="btn-bloque btn-secundario" @onclick="OnCancelar" disabled="@Ocupado">Cancelar</button>
+            <button class="btn-bloque @ClaseConfirmar" @onclick="OnConfirmar" disabled="@Ocupado">@TextoConfirmar</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Titulo { get; set; } = "Confirmar";
+    [Parameter] public string Mensaje { get; set; } = string.Empty;
+    [Parameter] public string TextoConfirmar { get; set; } = "Aceptar";
+    [Parameter] public string ClaseConfirmar { get; set; } = "btn-oscuro";
+    [Parameter] public bool Ocupado { get; set; }
+    [Parameter] public EventCallback OnConfirmar { get; set; }
+    [Parameter] public EventCallback OnCancelar { get; set; }
+}

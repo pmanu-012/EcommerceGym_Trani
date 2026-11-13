@@ -1,0 +1,112 @@
+﻿@page "/admin/pedido/{Id:int}"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Administrador")]
+@inject PedidoService Pedidos
+@inject AdminService Admin
+
+<!--detalle del pedido, más el control para pasar al siguiente estado-->
+
+<EncabezadoPagina Titulo="Detalle de pedido" />
+
+@if (error is not null)
+{
+    <div class="mensaje-error">@error</div>
+}
+else if (!cargado)
+{
+    <p class="estado-vacio">Cargando...</p>
+}
+else if (pedido is null)
+{
+    <p class="estado-vacio">El pedido no existe.</p>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(cliente))
+    {
+        <p class="cliente-linea">Cliente: <strong>@cliente</strong></p>
+    }
+
+    <PedidoDetalleVista Pedido="pedido" />
+
+    @if (mensajeOk is not null)
+    {
+        <div class="mensaje-ok">@mensajeOk</div>
+    }
+    @if (errorAccion is not null)
+    {
+        <div class="mensaje-error">@errorAccion</div>
+    }
+
+    @if (pedido.Estado == EstadoPedido.Entregado)
+    {
+        <p class="nota">Este pedido ya fue entregado.</p>
+    }
+    else
+    {
+        <button class="btn-accent btn-bloque" @onclick="() => confirmar = true">Pasar a "@Siguiente"</button>
+        @if (Siguiente == EstadoPedido.Confirmado)
+        {
+            <p class="nota">Al confirmar el pedido se descuenta el stock de los productos.</p>
+        }
+    }
+}
+
+<ConfirmDialog Visible="confirmar"
+               Titulo="Cambiar estado"
+               Mensaje="@MensajeConfirmacion"
+               TextoConfirmar="Cambiar estado"
+               Ocupado="ocupado"
+               OnConfirmar="Cambiar"
+               OnCancelar="() => confirmar = false" />
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private PedidoDto? pedido;
+    private string? cliente;
+    private bool cargado;
+    private bool confirmar;
+    private bool ocupado;
+    private string? error;
+    private string? errorAccion;
+    private string? mensajeOk;
+
+    private EstadoPedido Siguiente => pedido!.Estado + 1;
+
+    private string MensajeConfirmacion => pedido is null ? "" :
+        $"El pedido {Formato.NumeroPedido(Id)} pasará de {pedido.Estado} a {Siguiente}." +
+        (Siguiente == EstadoPedido.Confirmado ? " Se descontará el stock de los productos." : "");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        cargado = false; error = null; pedido = null; errorAccion = null; mensajeOk = null;
+        try
+        {
+            pedido = await Pedidos.GetPedidoAsync(Id);
+
+            // El nombre del cliente se obtiene buscando el pedido por su número en la lista del admin
+            var lista = await Admin.PedidosAsync(Formato.NumeroPedido(Id));
+            cliente = lista.FirstOrDefault(p => p.IdPedido == Id)?.Cliente;
+        }
+        catch (Exception) { error = "No se pudo cargar el pedido. Verificá tu conexión e intentá de nuevo."; }
+        cargado = true;
+    }
+
+    private async Task Cambiar()
+    {
+        ocupado = true; errorAccion = null; mensajeOk = null;
+        var (actualizado, mensaje) = await Admin.CambiarEstadoAsync(Id, Siguiente);
+        ocupado = false; confirmar = false;
+
+        if (actualizado is null)
+        {
+            errorAccion = mensaje;
+        }
+        else
+        {
+            pedido = actualizado;
+            mensajeOk = $"El pedido ahora está {pedido.Estado}.";
+        }
+    }
+}

@@ -1,4 +1,4 @@
-@host = http://EcommerceGymMovil.somee.com
+@host = http://localhost:5196
 
 ### Login como administrador
 # @name login
@@ -270,3 +270,69 @@ Authorization: Bearer {{login.response.body.$.token}}
 ### Un cliente no puede (403)
 GET {{host}}/api/estadisticas
 Authorization: Bearer {{loginCliente.response.body.$.token}}
+
+### Registrar un ingreso (el producto 5 aparece dos veces: se suman 10 + 2)
+# @name ingreso
+POST {{host}}/api/ingresos
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "observacion": "Reposición de proveedor",
+  "items": [
+    { "idProducto": 5, "cantidad": 10 },
+    { "idProducto": 1, "cantidad": 3 },
+    { "idProducto": 5, "cantidad": 2 }
+  ]
+}
+
+### Verificar el stock (tiene que haber subido 12)
+GET {{host}}/api/productos/5
+
+### Detalle y listado
+GET {{host}}/api/ingresos/{{ingreso.response.body.$.idIngreso}}
+Authorization: Bearer {{login.response.body.$.token}}
+
+###
+GET {{host}}/api/ingresos
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Ingreso vacío (400)
+POST {{host}}/api/ingresos
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "items": [] }
+
+### Cantidad 0 (400)
+POST {{host}}/api/ingresos
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "items": [ { "idProducto": 5, "cantidad": 0 } ] }
+
+### Producto inexistente (400)
+POST {{host}}/api/ingresos
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{ "items": [ { "idProducto": 9999, "cantidad": 1 } ] }
+
+### Un cliente no puede (403)
+POST {{host}}/api/ingresos
+Authorization: Bearer {{loginCliente.response.body.$.token}}
+Content-Type: application/json
+
+{ "items": [ { "idProducto": 5, "cantidad": 1 } ] }
+
+### Auditoría completa
+GET {{host}}/api/auditoria
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Solo cambios de productos
+GET {{host}}/api/auditoria?entidad=Producto&accion=Modificar&limite=10
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Solo ingresos
+GET {{host}}/api/auditoria?entidad=Ingreso
+Authorization: Bearer {{login.response.body.$.token}}

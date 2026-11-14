@@ -1,7 +1,6 @@
 ﻿using EcommerceGym.Shared.DTOs;
 using EcommerceGym.Shared.Enums;
 using System.Net.Http.Json;
-using static Android.Graphics.Paint;
 
 namespace EcommerceGym.App.Services;
 

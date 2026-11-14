@@ -67,7 +67,7 @@ Se usa para las reseñas de un producto y para las generales del Home-->
              TextoGuardar="@(editando ? "Guardar cambios" : "Publicar")"
              Inicial="@(editando && datos?.MiResena is not null ? new ResenaFormDto { Calificacion = datos.MiResena.Calificacion, Comentario = datos.MiResena.Comentario } : null)"
              Ocupado="ocupado"
-             Error="errorModal"
+             Error="@errorModal"
              OnGuardar="Guardar"
              OnCancelar="() => modalAbierto = false" />
 

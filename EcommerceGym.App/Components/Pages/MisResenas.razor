@@ -40,7 +40,7 @@ else
              TextoGuardar="Guardar cambios"
              Inicial="@(aEditar is null ? null : new ResenaFormDto { Calificacion = aEditar.Calificacion, Comentario = aEditar.Comentario })"
              Ocupado="ocupado"
-             Error="errorModal"
+             Error="@errorModal"
              OnGuardar="Guardar"
              OnCancelar="() => aEditar = null" />
 
